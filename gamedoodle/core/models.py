@@ -43,6 +43,13 @@ class Vote(TimestampedMixin, models.Model):
     game = models.ForeignKey("SteamGame", on_delete=models.CASCADE)
     username = models.CharField(max_length=256)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["event", "game", "username"], name="unique vote"
+            )
+        ]
+
     def __str__(self):
         return f"{self.username} wants to play '{self.game}' during '{self.event}'"
 
