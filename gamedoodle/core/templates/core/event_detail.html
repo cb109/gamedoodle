@@ -4,12 +4,37 @@
 <h3>
   {{ event.date|date:"d.m.Y" }}
 </h3>
-<ul>
-  {% for game in event.games.all|dictsort:"name" %}
-  <li>
-    {{ game.name }}
-  </li>
-  {% empty %}
-  No games yet
-  {% endfor %}
-</ul>
+
+<form action="{% url "event-vote" uuid=event.uuid %}" method="POST">
+  {% csrf_token %}
+  <label>
+    Who are you?
+    <input
+      type="text"
+      name="username"
+      required
+    >
+  </label>
+  <ul>
+    {% for game in games %}
+    <li>
+      {{ game.name }}
+      {{ game.create_vote_form }}
+      <button
+        type="submit"
+        value="{{ game.id }}"
+        name="game_id"
+      >
+        +
+      </button>
+      <div>
+        {% for vote in game.votes %}
+        {{ vote.username }}{% if not forloop.last%}, {% endif %}
+        {% endfor %}
+      </div>
+    </li>
+    {% empty %}
+    No games yet
+    {% endfor %}
+  </ul>
+</form>
