@@ -16,7 +16,10 @@ class Event(TimestampedMixin, models.Model):
 
     name = models.CharField(max_length=256)
     date = models.DateField(default=date.today)
-    games = models.ManyToManyField("SteamGame")
+    games = models.ManyToManyField("SteamGame", null=True, blank=True, default=None)
+
+    def __str__(self):
+        return f"{self.name} {self.date.strftime('%d.%m.%Y')}"
 
 
 class SteamGame(TimestampedMixin, models.Model):
