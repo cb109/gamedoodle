@@ -1,3 +1,4 @@
+import uuid
 from datetime import date
 
 from django.conf import settings
@@ -16,6 +17,7 @@ class TimestampedMixin(models.Model):
 class Event(TimestampedMixin, models.Model):
     """A date on which to play certain games that can be voted for."""
 
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=256)
     date = models.DateField(default=date.today)
     games = models.ManyToManyField("SteamGame", null=True, blank=True, default=None)
