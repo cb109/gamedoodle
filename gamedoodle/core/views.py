@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
@@ -20,25 +21,42 @@ class EventDetailView(generic.DetailView):
         context = super().get_context_data(**kwargs)
 
         event = self.get_object()
-        games = list(event.games.all().order_by("name"))
+        games = list(event.games.all())
 
         # Augment the instances
         for game in games:
             game.votes = Vote.objects.filter(game=game, event=event).order_by(
                 "username"
             )
+        games = sorted(
+            games, key=lambda game: f"{len(game.votes)}-{game.name}", reverse=True
+        )
 
         context["games"] = games
+        context["last_username"] = self.request.session.get("last_username", "")
         return context
+
+
+def format_username(username):
+    if settings.AUTO_FORMAT_USERNAMES:
+        username = username.lower().capitalize()
+    return username
 
 
 def vote(request, uuid):
     event = Event.objects.get(uuid=uuid)
 
-    Vote.objects.get_or_create(
-        event=event,
-        game_id=request.POST["game_id"],
-        username=request.POST["username"],
-    )
+    username = format_username(request.POST["username"])
 
+    vote_id = request.POST.get("vote_id")
+    if vote_id:
+        vote = Vote.objects.get(id=vote_id)
+        if vote.username == username:
+            vote.delete()
+
+    game_id = request.POST.get("game_id")
+    if game_id:
+        Vote.objects.get_or_create(event=event, game_id=game_id, username=username)
+
+    request.session["last_username"] = username
     return redirect(reverse("event-detail", kwargs={"uuid": uuid}))

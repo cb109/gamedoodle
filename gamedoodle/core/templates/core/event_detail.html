@@ -10,16 +10,18 @@
   <label>
     Who are you?
     <input
+      id="username-input"
       type="text"
       name="username"
       required
+      value="{{ last_username }}"
+      onchange="gameDoodle.storeLastUsernameInLocalStorage(event)"
     >
   </label>
-  <ul>
+  <ol>
     {% for game in games %}
     <li>
       {{ game.name }}
-      {{ game.create_vote_form }}
       <button
         type="submit"
         value="{{ game.id }}"
@@ -29,12 +31,37 @@
       </button>
       <div>
         {% for vote in game.votes %}
-        {{ vote.username }}{% if not forloop.last%}, {% endif %}
+          <button
+            class="vote"
+            type="submit"
+            value="{{ vote.id }}"
+            name="vote_id"
+          >
+            -
+          </button>
+          {{ vote.username }}
+        </button>{% if not forloop.last%}, {% endif %}
         {% endfor %}
       </div>
     </li>
     {% empty %}
     No games yet
     {% endfor %}
-  </ul>
+  </ol>
 </form>
+
+<script>
+  var gameDoodle = (function() {
+    return {
+      lastUsernameFromSession: '{{ last_username }}',
+      storeLastUsernameInLocalStorage: function(event) {
+        localStorage.setItem('gamedoodle__last_username', event.target.value);
+      }
+    };
+  })();
+
+  if (!gameDoodle.lastUsernameFromSession) {
+    var input = document.getElementById('username-input');
+    input.value = localStorage.getItem('gamedoodle__last_username') || '';
+  }
+</script>

@@ -121,5 +121,6 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 
+AUTO_FORMAT_USERNAMES = True
 DATE_FORMAT = "%d.%m.%Y"
 STEAM_API_KEY = os.environ.get("STEAM_API_KEY", "no-api-key-set")
