@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.http import HttpResponse
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import generic
@@ -15,6 +15,24 @@ def _format_username(username):
     if settings.AUTO_FORMAT_USERNAMES:
         username = username.lower().capitalize()
     return username
+
+
+def username_required(view):
+    """Decorator for view functions and generic View http handlers."""
+
+    def wrapper(*args, **kwargs):
+        # Handle both view(request, ...) and view(self, request, ...) signatures.
+        request = args[0]
+        if len(args) > 1 and isinstance(args[1], HttpRequest):
+            request = args[1]
+
+        if not _has_username(request):
+            who_are_you_url = reverse("who-are-you") + "?next=" + request.path
+            return redirect(who_are_you_url)
+
+        return view(*args, **kwargs)
+
+    return wrapper
 
 
 def who_are_you(request):
@@ -37,10 +55,8 @@ class EventDetailView(generic.DetailView):
     slug_url_kwarg = "uuid"
     slug_field = "uuid"
 
+    @username_required
     def get(self, request, *args, **kargs):
-        if not _has_username(request):
-            who_are_you_url = reverse("who-are-you") + "?next=" + request.path
-            return redirect(who_are_you_url)
         return super().get(request, *args, **kargs)
 
     def get_context_data(self, **kwargs):
@@ -62,6 +78,7 @@ class EventDetailView(generic.DetailView):
         return context
 
 
+@username_required
 def vote(request, uuid):
     event = Event.objects.get(uuid=uuid)
 
@@ -77,5 +94,4 @@ def vote(request, uuid):
     if game_id:
         Vote.objects.get_or_create(event=event, game_id=game_id, username=username)
 
-    request.session["last_username"] = username
     return redirect(reverse("event-detail", kwargs={"uuid": uuid}))
