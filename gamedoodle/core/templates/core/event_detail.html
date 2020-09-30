@@ -20,6 +20,7 @@
       </button>
       <div>
         {% for vote in game.votes %}
+          {% if vote.username == username %}
           <button
             class="vote"
             type="submit"
@@ -28,6 +29,7 @@
           >
             -
           </button>
+          {% endif %}
           {{ vote.username }}
         </button>{% if not forloop.last%}, {% endif %}
         {% endfor %}

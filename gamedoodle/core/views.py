@@ -7,8 +7,8 @@ from django.views import generic
 from gamedoodle.core.models import Event, Vote
 
 
-def _has_username(request):
-    return request.session.get("username") is not None
+def _get_username(request):
+    return request.session.get("username")
 
 
 def _format_username(username):
@@ -21,12 +21,14 @@ def username_required(view):
     """Decorator for view functions and generic View http handlers."""
 
     def wrapper(*args, **kwargs):
-        # Handle both view(request, ...) and view(self, request, ...) signatures.
+        # Handle these different signatures:
+        #   view(request, *args, **kwargs)
+        #   .view(self, request, *args, **kwargs)
         request = args[0]
         if len(args) > 1 and isinstance(args[1], HttpRequest):
             request = args[1]
 
-        if not _has_username(request):
+        if _get_username(request) is None:
             who_are_you_url = reverse("who-are-you") + "?next=" + request.path
             return redirect(who_are_you_url)
 
@@ -63,6 +65,7 @@ class EventDetailView(generic.DetailView):
         context = super().get_context_data(**kwargs)
 
         event = self.get_object()
+        username = _get_username(self.request)
         games = list(event.games.all())
 
         # Augment the instances
@@ -74,6 +77,7 @@ class EventDetailView(generic.DetailView):
             games, key=lambda game: f"{len(game.votes)}-{game.name}", reverse=True
         )
 
+        context["username"] = username
         context["games"] = games
         return context
 
@@ -81,8 +85,7 @@ class EventDetailView(generic.DetailView):
 @username_required
 def vote(request, uuid):
     event = Event.objects.get(uuid=uuid)
-
-    username = _format_username(request.POST["username"])
+    username = _get_username(request)
 
     vote_id = request.POST.get("vote_id")
     if vote_id:
