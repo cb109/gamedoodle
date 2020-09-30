@@ -7,6 +7,26 @@ from django.views import generic
 from gamedoodle.core.models import Event, Vote
 
 
+def _has_username(request):
+    return request.session.get("username") is not None
+
+
+def _format_username(username):
+    if settings.AUTO_FORMAT_USERNAMES:
+        username = username.lower().capitalize()
+    return username
+
+
+def who_are_you(request):
+    next_url = request.GET["next"]
+
+    if request.method == "POST":
+        request.session["username"] = _format_username(request.POST["username"])
+        return redirect(next_url)
+
+    return render(request, "core/who_are_you.html")
+
+
 class EventListView(generic.ListView):
     model = Event
     ordering = ("-date",)
@@ -16,6 +36,12 @@ class EventDetailView(generic.DetailView):
     model = Event
     slug_url_kwarg = "uuid"
     slug_field = "uuid"
+
+    def get(self, request, *args, **kargs):
+        if not _has_username(request):
+            who_are_you_url = reverse("who-are-you") + "?next=" + request.path
+            return redirect(who_are_you_url)
+        return super().get(request, *args, **kargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -33,20 +59,13 @@ class EventDetailView(generic.DetailView):
         )
 
         context["games"] = games
-        context["last_username"] = self.request.session.get("last_username", "")
         return context
-
-
-def format_username(username):
-    if settings.AUTO_FORMAT_USERNAMES:
-        username = username.lower().capitalize()
-    return username
 
 
 def vote(request, uuid):
     event = Event.objects.get(uuid=uuid)
 
-    username = format_username(request.POST["username"])
+    username = _format_username(request.POST["username"])
 
     vote_id = request.POST.get("vote_id")
     if vote_id:

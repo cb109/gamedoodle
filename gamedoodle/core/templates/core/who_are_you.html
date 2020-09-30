@@ -1,0 +1,20 @@
+<form method="POST">
+  {% csrf_token %}
+  <label>
+    Who are you?
+    <input
+      type="text"
+      name="username"
+      required
+    >
+  </label>
+  <input
+    type="text"
+    hidden2
+    name="next"
+    value="{{ next_url }}"
+  >
+  <button type="submit">
+    Submit
+  </button>
+</form>
