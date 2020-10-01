@@ -1,9 +1,16 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
 <h2>
   {{ event.name }}
 </h2>
 <h3>
   {{ event.date|date:"d.m.Y" }}
 </h3>
+<p>
+  Vote which games you want to play!
+</p>
 
 <form action="{% url "event-vote" uuid=event.uuid %}" method="POST">
   {% csrf_token %}
@@ -40,3 +47,5 @@
     {% endfor %}
   </ol>
 </form>
+
+{% endblock%}

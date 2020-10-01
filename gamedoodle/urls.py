@@ -21,6 +21,7 @@ from gamedoodle.core import views
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("whoareyou/", views.who_are_you, name="who-are-you"),
+    path("logout/", views.logout, name="logout"),
     path("events/", views.EventListView.as_view(), name="event-list"),
     path("events/<uuid:uuid>", views.EventDetailView.as_view(), name="event-detail"),
     path("events/<uuid:uuid>/vote", views.vote, name="event-vote"),

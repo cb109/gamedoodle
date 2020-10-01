@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>
+      {% block title %}
+        Game Doodle
+      {% endblock %}
+    </title>
+    <meta content charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+  </head>
+  <style>
+    body {
+      margin: 20px;
+    }
+  </style>
+  <body>
+    {% block navbar %}
+      {% if username %}
+      <div
+        style="text-align: right"
+      >
+        <span style="margin-right: 4px">{{ username }}</span>
+        <a href="{% url "logout" %}?next={{ request.path|urlencode }}">
+          Logout
+        </a>
+      </div>
+      {% endif %}
+    {% endblock %}
+
+    {% block content %}{% endblock%}
+  </body>
+</html>

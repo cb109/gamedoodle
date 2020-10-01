@@ -14,7 +14,7 @@ def _get_username(request):
 def _format_username(username):
     if settings.AUTO_FORMAT_USERNAMES:
         username = username.lower().capitalize()
-    return username
+    return username.strip()
 
 
 def username_required(view):
@@ -28,13 +28,19 @@ def username_required(view):
         if len(args) > 1 and isinstance(args[1], HttpRequest):
             request = args[1]
 
-        if _get_username(request) is None:
+        if _get_username(request) in (None, ""):
             who_are_you_url = reverse("who-are-you") + "?next=" + request.path
             return redirect(who_are_you_url)
 
         return view(*args, **kwargs)
 
     return wrapper
+
+
+def logout(request):
+    request.session.flush()
+    next_url = request.GET["next"]
+    return redirect(next_url)
 
 
 def who_are_you(request):

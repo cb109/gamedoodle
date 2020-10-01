@@ -1,7 +1,11 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
 <form method="POST">
   {% csrf_token %}
   <label>
-    Who are you?
+    What is your name?
     <input
       type="text"
       name="username"
@@ -10,11 +14,13 @@
   </label>
   <input
     type="text"
-    hidden2
+    hidden
     name="next"
     value="{{ next_url }}"
   >
   <button type="submit">
-    Submit
+    That's me
   </button>
 </form>
+
+{% endblock %}
