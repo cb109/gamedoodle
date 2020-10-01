@@ -8,55 +8,90 @@
     justify-content: center;
   "
 >
-
-
-  <h2 class="title nes-text is-primary">
-    {{ event.name }}
-  </h2>
-
-  <div class="nes-container is-rounded with-title">
-    <p class="title nes-text is-primary">
-      {{ event.date|date:"d.m.Y" }}
+  <div
+    style="
+      text-align: center;
+      margin-bottom: 32px;
+    "
+  >
+    <p>
+      <h1 class="nes-text is-primary">
+        {{ event.name }}
+      </h1>
+      <h2 class="nes-text">
+        {{ event.date|date:"l, d.m.Y" }}
+      </h2>
     </p>
     <p>
       Vote which games you want to play!
     </p>
-    <form action="{% url "event-vote" uuid=event.uuid %}" method="POST">
-      {% csrf_token %}
-      <ol>
-        {% for game in games %}
-        <li>
+  </div>
+  <form
+    id="form"
+    action="{% url "event-vote" uuid=event.uuid %}"
+    method="POST"
+  >
+    {% csrf_token %}
+    <ol>
+      {% for game in games %}
+      <li
+        class="nes-container is-rounded with-title"
+        style="margin-bottom: 32px"
+      >
+        <div class="title">
           {{ game.name }}
-          {% if game.current_user_can_vote %}
+        </div>
+        {% if game.current_user_can_vote %}
+        <div style="display: flex">
           <button
             type="submit"
             value="{{ game.id }}"
             name="game_id"
+            class="nes-btn is-success"
+            style="
+              margin-left: auto;
+              margin-right: auto;
+              margin-bottom: 24px;
+            "
           >
-            +
+            <i class="nes-icon is-medium like"></i>
           </button>
-          {% endif %}
-          <div>
-            {% for vote in game.votes %}
+        </div>
+        {% endif %}
+        <div style="margin-top: 32px;">
+          {% for vote in game.votes %}
+            <span
+              class="
+                nes-badge
+                {% if vote.username == username %}is-icon{% endif %}
+              "
+            >
               {% if vote.username == username %}
-              <button
-                class="vote"
-                type="submit"
-                value="{{ vote.id }}"
-                name="vote_id"
+              <span
+                class="is-error nes-pointer"
+                onclick="document.getElementById('btn-vote-{{ game.id }}').click()"
               >
-                -
-              </button>
+                <span style="font-size: 2em">x</span>
+                <button
+                  id="btn-vote-{{ game.id }}"
+                  type="submit"
+                  name="vote_id"
+                  value="{{ vote.id }}"
+                  style="display: none;"
+                ></button>
+              </span>
               {% endif %}
-              {{ vote.username }}</button>{% if not forloop.last%}, {% endif %}
-            {% endfor %}
-          </div>
-        </li>
-        {% empty %}
-        No games yet
-        {% endfor %}
-      </ol>
-    </form>
-  </div>
+              <span class="is-success">{{ vote.username }}</span>
+            </span>
+          </button>
+          {% endfor %}
+        </div>
+      </li>
+      {% empty %}
+      No games yet
+      {% endfor %}
+    </ol>
+  </form>
+
 </div>
 {% endblock%}

@@ -90,6 +90,7 @@ class EventDetailView(generic.DetailView):
 
 @username_required
 def vote(request, uuid):
+    """Handle both voting and unvoting for a Game."""
     event = Event.objects.get(uuid=uuid)
     username = _get_username(request)
 
