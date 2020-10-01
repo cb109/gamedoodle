@@ -20,7 +20,7 @@ class Event(TimestampedMixin, models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=256)
     date = models.DateField(default=date.today)
-    games = models.ManyToManyField("SteamGame", null=True, blank=True, default=None)
+    games = models.ManyToManyField("SteamGame", blank=True)
 
     def __str__(self):
         return f"{self.name} {self.date.strftime(settings.DATE_FORMAT)}"
