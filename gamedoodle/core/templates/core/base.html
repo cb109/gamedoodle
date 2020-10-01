@@ -8,26 +8,50 @@
     </title>
     <meta content charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+    <link href="https://unpkg.com/nes.css@2.3.0/css/nes.min.css" rel="stylesheet" />
   </head>
   <style>
     body {
       margin: 20px;
+      font-family: 'Press Start 2P';
+    }
+
+    [dbg], [dbg] * {
+      outline: 1px solid red !important;
     }
   </style>
   <body>
-    {% block navbar %}
-      {% if username %}
-      <div
-        style="text-align: right"
-      >
-        <span style="margin-right: 4px">{{ username }}</span>
-        <a href="{% url "logout" %}?next={{ request.path|urlencode }}">
-          Logout
-        </a>
-      </div>
-      {% endif %}
-    {% endblock %}
+    <div
+      style="
+        display: flex;
+        justify-content: center;
+      "
+    >
+      <div>
+        {% block navbar %}
+          {% if username %}
+          <div
+            style="text-align: right; margin-bottom: 20px;"
+          >
+            <span
+              class="nes-text"
+              style="margin-right: 8px"
+            >
+              {{ username }}
+            </span>
+            <a
+              class="nes-text is-error"
+              href="{% url "logout" %}?next={{ request.path|urlencode }}"
+            >
+              Logout
+            </a>
+          </div>
+          {% endif %}
+        {% endblock %}
 
-    {% block content %}{% endblock%}
+        {% block content %}{% endblock%}
+      </div>
+    </div>
   </body>
 </html>

@@ -76,9 +76,9 @@ class EventDetailView(generic.DetailView):
 
         # Augment the instances
         for game in games:
-            game.votes = Vote.objects.filter(game=game, event=event).order_by(
-                "username"
-            )
+            votes = Vote.objects.filter(game=game, event=event).order_by("username")
+            game.votes = votes
+            game.current_user_can_vote = not votes.filter(username=username).exists()
         games = sorted(
             games, key=lambda game: f"{len(game.votes)}-{game.name}", reverse=True
         )

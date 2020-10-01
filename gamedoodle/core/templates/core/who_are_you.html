@@ -1,26 +1,50 @@
 {% extends "core/base.html" %}
 
 {% block content %}
-
-<form method="POST">
-  {% csrf_token %}
-  <label>
-    What is your name?
+<div
+  style="
+    height: 100vh;
+    display: flex;
+    align-items: center;
+  "
+>
+  <form method="POST">
+    {% csrf_token %}
     <input
       type="text"
-      name="username"
-      required
+      hidden
+      name="next"
+      value="{{ next_url }}"
     >
-  </label>
-  <input
-    type="text"
-    hidden
-    name="next"
-    value="{{ next_url }}"
-  >
-  <button type="submit">
-    That's me
-  </button>
-</form>
+    <div
+      style="
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      "
+    >
 
+      <div class="nes-field">
+        <label for="username-field">
+          What is your name?
+        </label>
+        <input
+          type="text"
+          name="username"
+          id="username-field"
+          required
+          class="nes-input"
+          style="margin-top: 16px;"
+        >
+      </div>
+      <button
+        type="submit"
+        class="nes-btn is-success"
+        style="margin-top: 16px;"
+      >
+        That's me
+      </button>
+    </div>
+  </form>
+</div>
 {% endblock %}
