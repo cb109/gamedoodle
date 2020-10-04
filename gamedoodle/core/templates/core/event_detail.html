@@ -35,57 +35,68 @@
     <ol>
       {% for game in games %}
       <li
-        class="nes-container is-rounded with-title"
-        style="margin-bottom: 32px"
+        style="
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          margin-bottom: 32px;
+        "
       >
-        <div class="title">
-          {{ game.name }}
+        <div
+          class="nes-container is-rounded with-title"
+          style="flex-grow: 1"
+        >
+          <div class="title">
+            {{ game.name }}
+          </div>
+          <div style="margin-top: 32px;">
+            {% for vote in game.votes %}
+              <span style="white-space: nowrap">
+                {% if vote.username == username %}
+                <span
+                  class="nes-text is-error nes-pointer"
+                  onclick="document.getElementById('btn-vote-{{ game.id }}').click()"
+                >
+                  x
+                  <button
+                    id="btn-vote-{{ game.id }}"
+                    type="submit"
+                    name="vote_id"
+                    value="{{ vote.id }}"
+                    style="display: none;"
+                  ></button>
+                </span>
+                {% endif %}
+                <span class="nes-text is-success">
+                  {{ vote.username }}</span>{% if not forloop.last %}, {% endif %}
+              </span>
+            </button>
+            {% endfor %}
+          </div>
         </div>
         {% if game.current_user_can_vote %}
-        <div style="display: flex">
+        <div
+          style="
+            display: flex;
+            margin-left: 8px;
+          "
+        >
           <button
             type="submit"
             value="{{ game.id }}"
             name="game_id"
-            class="nes-btn is-success"
+            class="nes-btn"
+            title="Vote for playing this game"
             style="
-              margin-left: auto;
-              margin-right: auto;
+              margin-top: 24px;
               margin-bottom: 24px;
+              max-height: 72px;
             "
           >
             <i class="nes-icon is-medium like"></i>
           </button>
         </div>
         {% endif %}
-        <div style="margin-top: 32px;">
-          {% for vote in game.votes %}
-            <span
-              class="
-                nes-badge
-                {% if vote.username == username %}is-icon{% endif %}
-              "
-            >
-              {% if vote.username == username %}
-              <span
-                class="is-error nes-pointer"
-                onclick="document.getElementById('btn-vote-{{ game.id }}').click()"
-              >
-                <span style="font-size: 2em">x</span>
-                <button
-                  id="btn-vote-{{ game.id }}"
-                  type="submit"
-                  name="vote_id"
-                  value="{{ vote.id }}"
-                  style="display: none;"
-                ></button>
-              </span>
-              {% endif %}
-              <span class="is-success">{{ vote.username }}</span>
-            </span>
-          </button>
-          {% endfor %}
-        </div>
       </li>
       {% empty %}
       No games yet
