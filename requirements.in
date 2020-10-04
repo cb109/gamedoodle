@@ -1,0 +1,4 @@
+django
+gunicorn
+pip-tools
+requests
