@@ -124,3 +124,9 @@ STATIC_URL = "/static/"
 AUTO_FORMAT_USERNAMES = True
 DATE_FORMAT = "%d.%m.%Y"
 STEAM_API_KEY = os.environ.get("STEAM_API_KEY", "no-api-key-set")
+STEAM_API_URL_GET_APP_LIST = (
+    "https://api.steampowered.com/ISteamApps/GetAppList/v0002/"
+    f"?key={STEAM_API_KEY}&format=json"
+)
+STEAM_STORE_PAGE_BASE_URL = "https://store.steampowered.com/app/"  # + appid
+STEAM_API_BASE_URL_APPDETAILS = "https://store.steampowered.com/api/appdetails/?appids="

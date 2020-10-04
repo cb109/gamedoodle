@@ -29,10 +29,10 @@ class Event(TimestampedMixin, models.Model):
 class Game(TimestampedMixin, models.Model):
     """A Game on Steam."""
 
-    appid = models.PositiveIntegerField(null=True, blank=True, default=None)
     name = models.CharField(max_length=256)
-    image_url = models.CharField(max_length=256, default="")
-    store_url = models.CharField(max_length=256, default="")
+    appid = models.PositiveIntegerField(null=True, blank=True, default=None)
+    image_url = models.CharField(max_length=256, blank=True, default="")
+    store_url = models.CharField(max_length=256, blank=True, default="")
 
     def __str__(self):
         return f"{self.name} ({self.appid})"

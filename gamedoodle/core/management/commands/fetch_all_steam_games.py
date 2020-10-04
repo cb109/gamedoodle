@@ -4,17 +4,10 @@ from django.core.management.base import BaseCommand
 import requests
 from gamedoodle.core.models import Game
 
-STEAM_API_URL_GET_APP_LIST = (
-    "https://api.steampowered.com/ISteamApps/GetAppList/v0002/"
-    f"?key={settings.STEAM_API_KEY}&format=json"
-)
-
-STEAM_STORE_PAGE_BASE_URL = "https://store.steampowered.com/app/"  # + appid
-
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        response = requests.get(STEAM_API_URL_GET_APP_LIST)
+        response = requests.get(settings.STEAM_API_URL_GET_APP_LIST)
         data = response.json()
         apps = data["applist"]["apps"]
 
@@ -27,6 +20,6 @@ class Command(BaseCommand):
                 Game.objects.get_or_create(
                     appid=app["appid"],
                     name=app["name"],
-                    store_url=STEAM_STORE_PAGE_BASE_URL + app["appid"],
+                    store_url=settings.STEAM_STORE_PAGE_BASE_URL + app["appid"],
                 )
         print("done")

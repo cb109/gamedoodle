@@ -4,6 +4,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import generic
 
+import requests
 from gamedoodle.core.models import Event, Game, Vote
 
 
@@ -111,11 +112,21 @@ def vote_game(request, uuid):
 def add_game(request, uuid):
     """Display form to add a Game to an Event."""
     event = Event.objects.get(uuid=uuid)
-    return render(request, "core/event_add_game.html", {"event": event})
+
+    search_text = request.GET.get("q", "").strip()
+    games = []
+    if search_text:
+        games = Game.objects.filter(name__icontains=search_text).order_by("name")[:100]
+
+    return render(
+        request,
+        "core/event_add_game.html",
+        {"event": event, "steam_games": games, "search_text": search_text},
+    )
 
 
 @username_required
-def add_game_confirm(request, uuid):
+def add_game_manually(request, uuid):
     """Add actual game as specified."""
     event = Event.objects.get(uuid=uuid)
 
@@ -131,9 +142,31 @@ def add_game_confirm(request, uuid):
         game.store_url = store_url
     game.save()
 
-    from pprint import pprint
+    event.games.add(game)
+    return redirect(reverse("event-detail", kwargs={"uuid": uuid}))
 
-    pprint(game.__dict__)
+
+@username_required
+def add_game_steam(request, uuid):
+    """Add actual game selected from Steam search results."""
+    event = Event.objects.get(uuid=uuid)
+
+    appid = request.POST["appid"]
+    game = Game.objects.get(appid=appid)
+
+    if not game.store_url:
+        game.store_url = settings.STEAM_STORE_PAGE_BASE_URL + appid
+        game.save()
+
+    # Fetch details if we don't have any yet.
+    if not game.image_url:
+        url = settings.STEAM_API_BASE_URL_APPDETAILS + appid
+        response = requests.get(url)
+        data = response.json()[appid]["data"]
+        screenshots = data.get("screenshots", [])
+        if screenshots:
+            game.image_url = screenshots[0]["path_thumbnail"]
+            game.save()
 
     event.games.add(game)
     return redirect(reverse("event-detail", kwargs={"uuid": uuid}))
