@@ -38,6 +38,7 @@
         style="
           display: flex;
           flex-wrap: wrap;
+          justify-content: center;
           align-items: center;
           margin-bottom: 32px;
         "
@@ -47,14 +48,56 @@
           style="flex-grow: 1"
         >
           <div class="title">
+            {% if game.store_url %}
+            <a
+              href="{{ game.store_url }}"
+              target="_blank"
+              title="Open store page"
+            >
+              {{ game.name }}
+            </a>
+            {% else %}
             {{ game.name }}
+            {% endif %}
           </div>
+          {% if game.image_url %}
+          <div>
+            {% if game.store_url %}
+            <a
+              href="{{ game.store_url }}"
+              target="_blank"
+              title="Open store page"
+            >
+              <img
+                src="{{ game.image_url }}"
+                style="
+                  width: 100%;
+                  height: auto;
+                  max-width: 600px;
+                  max-height: 400px;
+                "
+              >
+            </a>
+            {% else %}
+            <img
+              src="{{ game.image_url }}"
+              style="
+                width: 100%;
+                height: auto;
+                max-width: 600px;
+                max-height: 400px;
+              "
+            >
+            {% endif %}
+          </div>
+          {% endif %}
           <div style="margin-top: 32px;">
             {% for vote in game.votes %}
               <span style="white-space: nowrap">
                 {% if vote.username == username %}
                 <span
                   class="nes-text is-error nes-pointer"
+                  title="Remove your vote for this game"
                   onclick="document.getElementById('btn-vote-{{ game.id }}').click()"
                 >
                   x

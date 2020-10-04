@@ -20,17 +20,19 @@ class Event(TimestampedMixin, models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=256)
     date = models.DateField(default=date.today)
-    games = models.ManyToManyField("SteamGame", blank=True)
+    games = models.ManyToManyField("Game", blank=True)
 
     def __str__(self):
         return f"{self.name} {self.date.strftime(settings.DATE_FORMAT)}"
 
 
-class SteamGame(TimestampedMixin, models.Model):
+class Game(TimestampedMixin, models.Model):
     """A Game on Steam."""
 
-    name = models.CharField(max_length=256)
     appid = models.PositiveIntegerField()
+    name = models.CharField(max_length=256)
+    image_url = models.CharField(max_length=256, default="")
+    store_url = models.CharField(max_length=256, default="")
 
     def __str__(self):
         return f"{self.name} ({self.appid})"
@@ -40,7 +42,7 @@ class Vote(TimestampedMixin, models.Model):
     """A User votes to play a Game during a certain Event."""
 
     event = models.ForeignKey("Event", on_delete=models.CASCADE)
-    game = models.ForeignKey("SteamGame", on_delete=models.CASCADE)
+    game = models.ForeignKey("Game", on_delete=models.CASCADE)
     username = models.CharField(max_length=256)
 
     class Meta:

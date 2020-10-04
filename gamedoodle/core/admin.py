@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import mark_safe
 
-from gamedoodle.core.models import Event, SteamGame, Vote
+from gamedoodle.core.models import Event, Game, Vote
 
 
 class EventAdmin(admin.ModelAdmin):
@@ -31,9 +31,20 @@ class EventAdmin(admin.ModelAdmin):
         return f"<a href='{url}' target='_blank'>{url}</a>"
 
 
-class SteamGameAdmin(admin.ModelAdmin):
+class GameAdmin(admin.ModelAdmin):
     list_display = ("name", "appid", "created_at", "modified_at", "id")
     search_fields = ("name", "appid")
+
+    @mark_safe
+    def image(self, game):
+        if not game.image_url.strip():
+            return ""
+
+        url = game.image_url
+        return (
+            f"<img src='{url}' style='width: 100%; height: auto; "
+            "max-width: 480px; max-height: 480px'>"
+        )
 
 
 class VoteAdmin(admin.ModelAdmin):
@@ -42,5 +53,5 @@ class VoteAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Event, EventAdmin)
-admin.site.register(SteamGame, SteamGameAdmin)
+admin.site.register(Game, GameAdmin)
 admin.site.register(Vote, VoteAdmin)
