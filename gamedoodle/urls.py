@@ -24,5 +24,11 @@ urlpatterns = [
     path("logout/", views.logout, name="logout"),
     path("events/", views.EventListView.as_view(), name="event-list"),
     path("events/<uuid:uuid>", views.EventDetailView.as_view(), name="event-detail"),
-    path("events/<uuid:uuid>/vote", views.vote, name="event-vote"),
+    path("events/<uuid:uuid>/votegame", views.vote_game, name="event-vote-game"),
+    path("events/<uuid:uuid>/addgame", views.add_game, name="event-add-game"),
+    path(
+        "events/<uuid:uuid>/addgame/confirm",
+        views.add_game_confirm,
+        name="event-add-game-confirm",
+    ),
 ]

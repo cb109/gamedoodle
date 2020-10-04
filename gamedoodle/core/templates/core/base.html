@@ -32,20 +32,28 @@
         {% block navbar %}
           {% if username %}
           <div
-            style="text-align: right; margin-bottom: 20px;"
+            style="
+              display: flex;
+              margin-bottom: 20px;
+            "
           >
-            <span
-              class="nes-text"
-              style="margin-right: 8px"
-            >
-              {{ username }}
-            </span>
-            <a
-              class="nes-text is-error"
-              href="{% url "logout" %}?next={{ request.path|urlencode }}"
-            >
-              Logout
-            </a>
+            {% block navbar_left %}{% endblock %}
+            {% block navbar_right %}
+            <div style="margin-left: auto;">
+              <span
+                class="nes-text"
+                style="margin-right: 8px"
+              >
+                {{ username }}
+              </span>
+              <a
+                class="nes-text is-error"
+                href="{% url "logout" %}?next={{ request.path|urlencode }}"
+              >
+                Logout
+              </a>
+            </div>
+            {% endblock %}
           </div>
           {% endif %}
         {% endblock %}

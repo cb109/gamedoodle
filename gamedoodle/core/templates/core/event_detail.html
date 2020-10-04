@@ -1,5 +1,14 @@
 {% extends "core/base.html" %}
 
+{% block navbar_left %}
+<a
+  class="nes-text is-success nes-pointer"
+  href="{% url "event-add-game" uuid=event.uuid %}"
+>
+  + Add Game
+</a>
+{% endblock %}
+
 {% block content %}
 <div
   style="
@@ -23,13 +32,14 @@
       </h2>
     </p>
     <p>
-      Vote which games you want to play!
+      Games are sorted by votes, most popular on top.
     </p>
   </div>
   <form
     id="form"
-    action="{% url "event-vote" uuid=event.uuid %}"
+    action="{% url "event-vote-game" uuid=event.uuid %}"
     method="POST"
+    style="width: 800px"
   >
     {% csrf_token %}
     <ol>
@@ -45,7 +55,7 @@
       >
         <div
           class="nes-container is-rounded with-title"
-          style="flex-grow: 1"
+          style="flex-grow: 1;"
         >
           <div class="title">
             {% if game.store_url %}
@@ -73,7 +83,7 @@
                 style="
                   width: 100%;
                   height: auto;
-                  max-width: 600px;
+                  max-width: 608px;
                   max-height: 400px;
                 "
               >

@@ -4,7 +4,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import generic
 
-from gamedoodle.core.models import Event, Vote
+from gamedoodle.core.models import Event, Game, Vote
 
 
 def _get_username(request):
@@ -89,7 +89,7 @@ class EventDetailView(generic.DetailView):
 
 
 @username_required
-def vote(request, uuid):
+def vote_game(request, uuid):
     """Handle both voting and unvoting for a Game."""
     event = Event.objects.get(uuid=uuid)
     username = _get_username(request)
@@ -104,4 +104,36 @@ def vote(request, uuid):
     if game_id:
         Vote.objects.get_or_create(event=event, game_id=game_id, username=username)
 
+    return redirect(reverse("event-detail", kwargs={"uuid": uuid}))
+
+
+@username_required
+def add_game(request, uuid):
+    """Display form to add a Game to an Event."""
+    event = Event.objects.get(uuid=uuid)
+    return render(request, "core/event_add_game.html", {"event": event})
+
+
+@username_required
+def add_game_confirm(request, uuid):
+    """Add actual game as specified."""
+    event = Event.objects.get(uuid=uuid)
+
+    name = request.POST["name"].strip()
+    image_url = request.POST.get("image_url", "")
+    store_url = request.POST.get("store_url", "")
+
+    # Ensure Game exists.
+    game, created = Game.objects.get_or_create(name=name)
+    if not game.image_url or created:
+        game.image_url = image_url
+    if not game.store_url or created:
+        game.store_url = store_url
+    game.save()
+
+    from pprint import pprint
+
+    pprint(game.__dict__)
+
+    event.games.add(game)
     return redirect(reverse("event-detail", kwargs={"uuid": uuid}))

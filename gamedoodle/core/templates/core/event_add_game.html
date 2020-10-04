@@ -1,0 +1,88 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div
+  style="
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  "
+>
+  <h2>
+    Add another game to <a href="{% url "event-detail" uuid=event.uuid %}">{{ event.name }}</a>
+  </h2>
+  <form method="GET">
+    <div
+      class="nes-container with-title"
+      style="margin-top: 32px;"
+    >
+      <p class="title">Option 1: Add via Steam search</p>
+      <div style="display: flex;">
+        <input
+          type="text"
+          class="nes-input"
+          style="margin-right: 16px;"
+        >
+        <button class="nes-btn">Search</button>
+      </div>
+    </div>
+  </form>
+
+  <form
+    action="{% url "event-add-game-confirm" uuid=event.uuid %}"
+    method="POST"
+  >
+    {% csrf_token %}
+    <div
+      class="nes-container with-title"
+      style="
+        display: flex;
+        flex-direction: column;
+        margin-top: 32px;
+      "
+    >
+      <p class="title">Option 2: Add manually</p>
+      <div
+        style="
+          display: flex;
+          flex-direction: column;
+        "
+      >
+        <label>
+          Name
+          <input
+            type="text"
+            class="nes-input"
+            name="name"
+            required
+          >
+        </label>
+        <label>
+          Image URL
+          <input
+            type="text"
+            class="nes-input"
+            name="image_url"
+          >
+        </label>
+        <label>
+          Store URL
+          <input
+            type="text"
+            class="nes-input"
+            name="store_url"
+          >
+        </label>
+      </div>
+      <button
+        class="nes-btn is-success"
+        style="margin-left: auto;"
+        type="submit"
+      >
+        Add Game
+      </button>
+    </div>
+
+  </form>
+</div>
+{% endblock%}
