@@ -32,14 +32,13 @@
       </h2>
     </p>
     <p>
-      Games are sorted by votes, most popular on top.
+      Vote which games to play!
     </p>
   </div>
   <form
     id="form"
     action="{% url "event-vote-game" uuid=event.uuid %}"
     method="POST"
-    style="width: 800px"
   >
     {% csrf_token %}
     <ol>
@@ -55,7 +54,9 @@
       >
         <div
           class="nes-container is-rounded with-title"
-          style="flex-grow: 1;"
+          style="
+            flex-grow: 1;
+          "
         >
           <div class="title">
             {% if game.store_url %}
@@ -83,8 +84,8 @@
                 style="
                   width: 100%;
                   height: auto;
-                  max-width: 608px;
-                  max-height: 400px;
+                  max-width: 480px;
+                  max-height: 360px;
                 "
               >
             </a>
