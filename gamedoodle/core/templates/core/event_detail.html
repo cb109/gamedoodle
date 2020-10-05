@@ -51,7 +51,7 @@
         margin-bottom: 32px;
       "
     >
-      <div dbg2
+      <div
         class="nes-container is-rounded with-title"
         style="
           flex-grow: 1;
@@ -62,6 +62,7 @@
         "
       >
         <div class="title">
+          {{ forloop.counter }}.
           <a
             href="{{ game.store_url }}"
             target="_blank"
@@ -69,7 +70,13 @@
           >
             {{ game.name }}
           </a>
+          {% if game.votes.exists %}
+          <span class="nes-text is-success">
+            &nbsp;+{{ game.votes|length }}&nbsp;
+          </span>
+          {% endif %}
         </div>
+
 
         {% if game.image_url %}
         <div style="flex-grow: 1">
@@ -102,30 +109,12 @@
         </div>
         {% endif %}
 
-        {% if game.current_user_can_vote %}
         <div
           style="
-            display: flex;
-            margin-left: 8px;
+            margin-top: 16px;
+            margin-bottom: 16px;
           "
         >
-          <button
-            type="submit"
-            value="{{ game.id }}"
-            name="game_id"
-            class="nes-btn"
-            title="Vote for playing this game"
-            style="
-              margin-top: 16px;
-              max-height: 72px;
-            "
-          >
-            <i class="nes-icon is-medium like"></i>
-          </button>
-        </div>
-        {% endif %}
-
-        <div style="margin-top: 16px;">
           {% for vote in game.votes %}
             <span style="white-space: nowrap">
               {% if vote.username == username %}
@@ -150,6 +139,29 @@
           </button>
           {% endfor %}
         </div>
+
+        {% if game.current_user_can_vote %}
+        <div
+          style="
+            display: flex;
+            margin-left: 8px;
+            margin-bottom: 16px;
+          "
+        >
+          <button
+            type="submit"
+            value="{{ game.id }}"
+            name="game_id"
+            class="nes-btn"
+            title="Vote for playing this game"
+            style="
+              max-height: 72px;
+            "
+          >
+            <i class="nes-icon is-medium like"></i>
+          </button>
+        </div>
+        {% endif %}
 
       </div>
     </div>
