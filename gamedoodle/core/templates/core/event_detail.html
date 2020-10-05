@@ -41,93 +41,67 @@
     method="POST"
   >
     {% csrf_token %}
-    <ol>
-      {% for game in games %}
-      <li
+    {% for game in games %}
+    <div
+      style="
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 32px;
+      "
+    >
+      <div dbg2
+        class="nes-container is-rounded with-title"
         style="
+          flex-grow: 1;
           display: flex;
-          flex-wrap: wrap;
+          flex-direction: column;
           justify-content: center;
           align-items: center;
-          margin-bottom: 32px;
         "
       >
-        <div
-          class="nes-container is-rounded with-title"
-          style="
-            flex-grow: 1;
-          "
-        >
-          <div class="title">
-            {% if game.store_url %}
-            <a
-              href="{{ game.store_url }}"
-              target="_blank"
-              title="Open store page"
-            >
-              {{ game.name }}
-            </a>
-            {% else %}
+        <div class="title">
+          <a
+            href="{{ game.store_url }}"
+            target="_blank"
+            title="Open store page"
+          >
             {{ game.name }}
-            {% endif %}
-          </div>
-          {% if game.image_url %}
-          <div>
-            {% if game.store_url %}
-            <a
-              href="{{ game.store_url }}"
-              target="_blank"
-              title="Open store page"
-            >
-              <img
-                src="{{ game.image_url }}"
-                style="
-                  width: 100%;
-                  height: auto;
-                  max-width: 480px;
-                  max-height: 360px;
-                "
-              >
-            </a>
-            {% else %}
+          </a>
+        </div>
+
+        {% if game.image_url %}
+        <div style="flex-grow: 1">
+          {% if game.store_url %}
+          <a
+            href="{{ game.store_url }}"
+            target="_blank"
+            title="Open store page"
+          >
             <img
               src="{{ game.image_url }}"
               style="
                 width: 100%;
                 height: auto;
-                max-width: 600px;
-                max-height: 400px;
+                max-width: 720px;
+                max-height: 360px;
               "
             >
-            {% endif %}
-          </div>
+          </a>
+          {% else %}
+          <img
+            src="{{ game.image_url }}"
+            style="
+              width: 100%;
+              height: auto;
+              max-height: 400px;
+            "
+          >
           {% endif %}
-          <div style="margin-top: 32px;">
-            {% for vote in game.votes %}
-              <span style="white-space: nowrap">
-                {% if vote.username == username %}
-                <span
-                  class="nes-text is-error nes-pointer"
-                  title="Remove your vote for this game"
-                  onclick="document.getElementById('btn-vote-{{ game.id }}').click()"
-                >
-                  x
-                  <button
-                    id="btn-vote-{{ game.id }}"
-                    type="submit"
-                    name="vote_id"
-                    value="{{ vote.id }}"
-                    style="display: none;"
-                  ></button>
-                </span>
-                {% endif %}
-                <span class="nes-text is-success">
-                  {{ vote.username }}</span>{% if not forloop.last %}, {% endif %}
-              </span>
-            </button>
-            {% endfor %}
-          </div>
         </div>
+        {% endif %}
+
         {% if game.current_user_can_vote %}
         <div
           style="
@@ -142,8 +116,7 @@
             class="nes-btn"
             title="Vote for playing this game"
             style="
-              margin-top: 24px;
-              margin-bottom: 24px;
+              margin-top: 16px;
               max-height: 72px;
             "
           >
@@ -151,11 +124,38 @@
           </button>
         </div>
         {% endif %}
-      </li>
-      {% empty %}
-      No games yet
-      {% endfor %}
-    </ol>
+
+        <div style="margin-top: 16px;">
+          {% for vote in game.votes %}
+            <span style="white-space: nowrap">
+              {% if vote.username == username %}
+              <span
+                class="nes-text is-error nes-pointer"
+                title="Remove your vote for this game"
+                onclick="document.getElementById('btn-vote-{{ game.id }}').click()"
+              >
+                x
+                <button
+                  id="btn-vote-{{ game.id }}"
+                  type="submit"
+                  name="vote_id"
+                  value="{{ vote.id }}"
+                  style="display: none;"
+                ></button>
+              </span>
+              {% endif %}
+              <span class="nes-text is-success">
+                {{ vote.username }}</span>{% if not forloop.last %}, {% endif %}
+            </span>
+          </button>
+          {% endfor %}
+        </div>
+
+      </div>
+    </div>
+    {% empty %}
+    No games yet
+    {% endfor %}
   </form>
 
 </div>
