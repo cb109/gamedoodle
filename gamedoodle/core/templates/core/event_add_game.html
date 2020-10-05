@@ -12,14 +12,14 @@
     Add another game to <a href="{% url "event-detail" uuid=event.uuid %}">{{ event.name }}</a>
   </h2>
   <div
-    class="nes-container with-title"
+    class="nes-container is-rounded with-title"
     style="margin-top: 32px;"
   >
+    <p class="title">Option 1: Add via Steam search</p>
     <form
       method="GET"
       action="{% url "event-add-game" uuid=event.uuid %}"
     >
-      <p class="title">Option 1: Add via Steam search</p>
       <div
         style="
           display: flex;
@@ -49,8 +49,14 @@
     {% if steam_games %}
     <div
       class="nes-table-responsive"
-      style="margin-top: 32px"
+      style="margin-top: 16px"
     >
+      <div
+        class="nes-text is-success"
+        style="margin-bottom: 16px;"
+      >
+        {{ steam_games|length }} matching games found:
+      </div>
       <table class="nes-table is-bordered hoverable">
         {% for game in steam_games  %}
         <tr>
@@ -86,6 +92,15 @@
         {% endfor %}
       </table>
     </div>
+    {% else %}
+      {% if search_text %}
+      <div
+        class="nes-text is-warning"
+        style="margin-top: 16px;"
+      >
+        No matching games found, try changing the search terms.
+      </div>
+      {% endif %}
     {% endif %}
   </div>
 
@@ -95,7 +110,7 @@
   >
     {% csrf_token %}
     <div
-      class="nes-container with-title"
+      class="nes-container is-rounded with-title"
       style="
         display: flex;
         flex-direction: column;
@@ -137,7 +152,10 @@
       </div>
       <button
         class="nes-btn is-success"
-        style="margin-left: auto;"
+        style="
+          margin-left: auto;
+          margin-top: 16px;
+        "
         type="submit"
       >
         Add Game
