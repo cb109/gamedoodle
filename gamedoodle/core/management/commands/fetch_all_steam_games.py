@@ -11,15 +11,17 @@ class Command(BaseCommand):
         data = response.json()
         apps = data["applist"]["apps"]
 
+        fixed_name = app["name"]
+
         if Game.objects.count() == 0:
-            games = [Game(appid=app["appid"], name=app["name"]) for app in apps]
+            games = [Game(appid=app["appid"], name=fixed_name) for app in apps]
             Game.objects.bulk_create(games)
         else:
             for i, app in enumerate(apps):
                 print(i + 1, len(apps))
                 Game.objects.get_or_create(
                     appid=app["appid"],
-                    name=app["name"],
+                    name=fixed_name,
                     store_url=settings.STEAM_STORE_PAGE_BASE_URL + app["appid"],
                 )
         print("done")
