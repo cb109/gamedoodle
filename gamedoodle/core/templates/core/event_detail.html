@@ -64,11 +64,12 @@
         <div
           class="title"
           style="
+            margin-right: auto;
             position: relative;
-            top: {% if game.is_free %}-12px{% else %}-8px{% endif %};
+            top: -8px;
           "
         >
-          {{ forloop.counter }}.
+          {{ game.voting_rank }}.
           <a
             href="{{ game.store_url }}"
             target="_blank"
@@ -77,12 +78,21 @@
             {{ game.name }}
           </a>
           {% if game.votes.exists %}
-          <span class="nes-text is-success">
+          <span
+            class="nes-text is-success"
+          >
             &nbsp;+{{ game.votes|length }}&nbsp;
           </span>
           {% endif %}
           {% if game.is_free %}
-          <a href="#" class="nes-badge">
+          <a
+            href="#"
+            class="nes-badge"
+            style="
+              position: relative;
+              top: -6px;
+            "
+          >
             <span class="is-warning">free</span>
           </a>
           {% endif %}

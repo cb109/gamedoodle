@@ -80,9 +80,15 @@ class EventDetailView(generic.DetailView):
             votes = Vote.objects.filter(game=game, event=event).order_by("username")
             game.votes = votes
             game.current_user_can_vote = not votes.filter(username=username).exists()
+
         games = sorted(
             games, key=lambda game: f"{len(game.votes)}-{game.name}", reverse=True
         )
+        sorted_unique_num_votes = sorted(
+            list(set([len(game.votes) for game in games])), reverse=True
+        )
+        for game in games:
+            game.voting_rank = sorted_unique_num_votes.index(len(game.votes)) + 1
 
         context["username"] = username
         context["games"] = games
