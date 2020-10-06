@@ -133,12 +133,14 @@ def add_game_manually(request, uuid):
     name = request.POST["name"].strip()
     image_url = request.POST.get("image_url", "")
     store_url = request.POST.get("store_url", "")
+    is_free = request.POST.get("is_free", None) == "on"
 
     # Ensure Game exists.
     game, created = Game.objects.get_or_create(name=name)
-    if not game.image_url or created:
+    game.is_free = is_free
+    if game.image_url != image_url and image_url.strip() != "":
         game.image_url = image_url
-    if not game.store_url or created:
+    if game.store_url != store_url and store_url.strip() != "":
         game.store_url = store_url
     game.save()
 
@@ -158,15 +160,18 @@ def add_game_steam(request, uuid):
         game.store_url = settings.STEAM_STORE_PAGE_BASE_URL + appid
         game.save()
 
-    # Fetch details if we don't have any yet.
-    if not game.image_url:
-        url = settings.STEAM_API_BASE_URL_APPDETAILS + appid
-        response = requests.get(url)
-        data = response.json()[appid]["data"]
-        screenshots = data.get("screenshots", [])
-        if screenshots:
-            game.image_url = screenshots[0]["path_thumbnail"]
-            game.save()
+    # Fetch to set/update details.
+    url = settings.STEAM_API_BASE_URL_APPDETAILS + appid
+    response = requests.get(url)
+    data = response.json()[appid]["data"]
+
+    screenshots = data.get("screenshots", [])
+    if game.image_url == "" and screenshots:
+        first_thumbnail = screenshots[0]["path_thumbnail"]
+        game.image_url = first_thumbnail
+
+    game.is_free = data["is_free"]
+    game.save()
 
     event.games.add(game)
     return redirect(reverse("event-detail", kwargs={"uuid": uuid}))

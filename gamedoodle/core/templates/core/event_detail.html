@@ -61,7 +61,13 @@
           align-items: center;
         "
       >
-        <div class="title">
+        <div
+          class="title"
+          style="
+            position: relative;
+            top: {% if game.is_free %}-12px{% else %}-8px{% endif %};
+          "
+        >
           {{ forloop.counter }}.
           <a
             href="{{ game.store_url }}"
@@ -74,6 +80,11 @@
           <span class="nes-text is-success">
             &nbsp;+{{ game.votes|length }}&nbsp;
           </span>
+          {% endif %}
+          {% if game.is_free %}
+          <a href="#" class="nes-badge">
+            <span class="is-warning">free</span>
+          </a>
           {% endif %}
         </div>
 

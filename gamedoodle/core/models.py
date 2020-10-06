@@ -33,6 +33,7 @@ class Game(TimestampedMixin, models.Model):
     appid = models.PositiveIntegerField(null=True, blank=True, default=None)
     image_url = models.CharField(max_length=256, blank=True, default="")
     store_url = models.CharField(max_length=256, blank=True, default="")
+    is_free = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.name} ({self.appid})"
