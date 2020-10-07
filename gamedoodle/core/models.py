@@ -21,9 +21,14 @@ class Event(TimestampedMixin, models.Model):
     name = models.CharField(max_length=256)
     date = models.DateField(default=date.today)
     games = models.ManyToManyField("Game", blank=True)
+    read_only = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.name} {self.date.strftime(settings.DATE_FORMAT)}"
+
+    @property
+    def is_writable(self):
+        return not self.read_only
 
 
 class Game(TimestampedMixin, models.Model):

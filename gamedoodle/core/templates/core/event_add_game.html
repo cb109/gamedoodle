@@ -73,9 +73,13 @@
                 hidden
               >
               <button
-                class="nes-btn is-success"
-                style="margin-right: 16px"
                 type="submit"
+                class="nes-btn {% if event.read_only %}is-disabled{% else %}is-success{% endif %}"
+                {% if event.read_only %}
+                title="Event is in read-only mode"
+                disabled
+                {% endif %}
+                style="margin-right: 16px"
               >
                 +
               </button>
@@ -159,12 +163,16 @@
         </label>
       </div>
       <button
-        class="nes-btn is-success"
+        type="submit"
+        class="nes-btn {% if event.read_only %}is-disabled{% else %}is-success{% endif %}"
+        {% if event.read_only %}
+        title="Event is in read-only mode"
+        disabled
+        {% endif %}
         style="
           margin-left: auto;
           margin-top: 16px;
         "
-        type="submit"
       >
         Add Game
       </button>

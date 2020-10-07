@@ -9,10 +9,12 @@ class EventAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "date",
+        "writable",
         "gameslist",
         "uuid",
         "created_at",
         "modified_at",
+        "url",
         "id",
     )
     search_fields = ("name", "date", "gameslist")
@@ -22,8 +24,20 @@ class EventAdmin(admin.ModelAdmin):
         "url",
     )
 
+    def writable(self, event):
+        return event.is_writable
+
+    writable.boolean = True
+
+    @mark_safe
     def gameslist(self, event):
-        return ", ".join([game.name for game in event.games.all().order_by("name")])
+        lis = "".join(
+            [
+                f"<li><a href='{game.store_url}' target='_blank'>{game.name}</a></li>"
+                for game in event.games.all().order_by("name")
+            ]
+        )
+        return f"<ul>{lis}<ul>"
 
     @mark_safe
     def url(self, event):

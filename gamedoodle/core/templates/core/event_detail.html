@@ -34,6 +34,11 @@
     <p>
       Vote which games to play!
     </p>
+    {% if event.read_only %}
+    <div class="nes-text is-warning">
+      Event is in read-only mode and can not be modified!
+    </div>
+    {% endif %}
   </div>
   <form
     id="form"
@@ -86,7 +91,7 @@
           {% endif %}
           {% if game.is_free %}
           <a
-            href="#"
+            href="javascript:void(0)"
             class="nes-badge"
             style="
               position: relative;
@@ -141,7 +146,11 @@
               {% if vote.username == username %}
               <span
                 class="nes-text is-error nes-pointer"
-                title="Remove your vote for this game"
+                {% if event.read_only %}
+                  title="Event is in read-only mode"
+                {% else %}
+                  title="Remove your vote for this game"
+                {% endif %}
                 onclick="document.getElementById('btn-vote-{{ game.id }}').click()"
               >
                 x
@@ -150,6 +159,7 @@
                   type="submit"
                   name="vote_id"
                   value="{{ vote.id }}"
+                  {% if event.read_only %}disabled{% endif %}
                   style="display: none;"
                 ></button>
               </span>
@@ -173,7 +183,11 @@
             type="submit"
             value="{{ game.id }}"
             name="game_id"
-            class="nes-btn"
+            class="nes-btn {% if event.read_only %}is-disabled{% endif %}"
+            {% if event.read_only %}
+            title="Event is in read-only mode"
+            disabled
+            {% endif %}
             title="Vote for playing this game"
             style="
               max-height: 72px;

@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
@@ -36,6 +37,11 @@ def username_required(view):
         return view(*args, **kwargs)
 
     return wrapper
+
+
+def _raise_if_event_not_writable(event):
+    if event.read_only:
+        raise ValidationError(f"{event} is in read-only mode")
 
 
 def logout(request):
@@ -99,6 +105,8 @@ class EventDetailView(generic.DetailView):
 def vote_game(request, uuid):
     """Handle both voting and unvoting for a Game."""
     event = Event.objects.get(uuid=uuid)
+    _raise_if_event_not_writable(event)
+
     username = _get_username(request)
 
     vote_id = request.POST.get("vote_id")
@@ -116,7 +124,12 @@ def vote_game(request, uuid):
 
 @username_required
 def add_game(request, uuid):
-    """Display form to add a Game to an Event."""
+    """Display form to add a Game to an Event.
+
+    This just shows a form and maybe some search results: Nothing is
+    added here yet, there is another step to confirm.
+
+    """
     event = Event.objects.get(uuid=uuid)
 
     search_text = request.GET.get("q", "").strip()
@@ -135,6 +148,7 @@ def add_game(request, uuid):
 def add_game_manually(request, uuid):
     """Add actual game as specified."""
     event = Event.objects.get(uuid=uuid)
+    _raise_if_event_not_writable(event)
 
     name = request.POST["name"].strip()
     image_url = request.POST.get("image_url", "")
@@ -158,6 +172,7 @@ def add_game_manually(request, uuid):
 def add_game_steam(request, uuid):
     """Add actual game selected from Steam search results."""
     event = Event.objects.get(uuid=uuid)
+    _raise_if_event_not_writable(event)
 
     appid = request.POST["appid"]
     game = Game.objects.get(appid=appid)
