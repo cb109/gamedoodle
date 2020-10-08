@@ -60,11 +60,6 @@ def who_are_you(request):
     return render(request, "core/who_are_you.html")
 
 
-class EventListView(generic.ListView):
-    model = Event
-    ordering = ("-date",)
-
-
 class EventDetailView(generic.DetailView):
     model = Event
     slug_url_kwarg = "uuid"
