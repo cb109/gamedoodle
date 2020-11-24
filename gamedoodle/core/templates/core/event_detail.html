@@ -27,9 +27,11 @@
       <h1 class="nes-text is-primary">
         {{ event.name }}
       </h1>
+      {% if event.date %}
       <h2 class="nes-text">
         {{ event.date|date:"l, d.m.Y" }}
       </h2>
+      {% endif %}
     </p>
     <p>
       Vote which games to play!

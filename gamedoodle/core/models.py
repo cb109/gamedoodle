@@ -19,12 +19,15 @@ class Event(TimestampedMixin, models.Model):
 
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=256)
-    date = models.DateField(default=date.today)
+    date = models.DateField(default=date.today, blank=True, null=True)
     games = models.ManyToManyField("Game", blank=True)
     read_only = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.name} {self.date.strftime(settings.DATE_FORMAT)}"
+        date_str = "no date yet"
+        if self.date:
+            date_str = self.date.strftime(settings.DATE_FORMAT)
+        return f"{self.name} {date_str}"
 
     @property
     def is_writable(self):
