@@ -33,6 +33,11 @@
       </h2>
       {% endif %}
     </p>
+    {% if event.details %}
+    <p>
+      {{ event.details|urlize }}
+    </p>
+    {% endif %}
     <p>
       Vote which games to play!
     </p>
