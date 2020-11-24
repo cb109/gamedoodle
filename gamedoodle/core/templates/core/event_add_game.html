@@ -15,7 +15,7 @@
     class="nes-container is-rounded with-title"
     style="margin-top: 32px;"
   >
-    <p class="title">Option 1: Add via Steam search</p>
+    <p class="title">Option 1: Add via search (Steam or existing)</p>
     <form
       method="GET"
       action="{% url "event-add-game" uuid=event.uuid %}"
@@ -46,7 +46,7 @@
         </button>
       </div>
     </form>
-    {% if steam_games %}
+    {% if matching_games %}
     <div
       class="nes-table-responsive"
       style="margin-top: 16px"
@@ -55,21 +55,21 @@
         class="nes-text is-success"
         style="margin-bottom: 16px;"
       >
-        {{ steam_games|length }} matching games found:
+        {{ matching_games|length }} matching games found:
       </div>
       <table class="nes-table is-bordered hoverable">
-        {% for game in steam_games  %}
+        {% for game in matching_games  %}
         <tr>
           <td>
             <form
               method="POST"
-              action="{% url "event-add-game-steam" uuid=event.uuid %}"
+              action="{% url "event-add-matching-game" uuid=event.uuid %}"
             >
               {% csrf_token %}
               <input
                 type="text"
-                name="appid"
-                value="{{ game.appid }}"
+                name="game_id"
+                value="{{ game.id }}"
                 hidden
               >
               <button

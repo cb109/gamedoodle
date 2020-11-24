@@ -128,16 +128,16 @@ def add_game(request, uuid):
     event = Event.objects.get(uuid=uuid)
 
     search_text = request.GET.get("q", "").strip()
-    steam_games = []
+    matching_games = []
     if search_text:
-        steam_games = Game.objects.filter(
-            appid__isnull=False, name__icontains=search_text
-        ).order_by("name")[:100]
+        matching_games = Game.objects.filter(name__icontains=search_text).order_by(
+            "name"
+        )[:100]
 
     return render(
         request,
         "core/event_add_game.html",
-        {"event": event, "steam_games": steam_games, "search_text": search_text},
+        {"event": event, "matching_games": matching_games, "search_text": search_text},
     )
 
 
@@ -166,30 +166,33 @@ def add_game_manually(request, uuid):
 
 
 @username_required
-def add_game_steam(request, uuid):
-    """Add actual game selected from Steam search results."""
+def add_matching_game(request, uuid):
+    """Add actual game selected from Steam search results or an existing one."""
     event = Event.objects.get(uuid=uuid)
     _raise_if_event_not_writable(event)
 
-    appid = request.POST["appid"]
-    game = Game.objects.get(appid=appid)
+    game_id = request.POST["game_id"]
+    game = Game.objects.get(id=game_id)
 
-    if not game.store_url:
-        game.store_url = settings.STEAM_STORE_PAGE_BASE_URL + appid
+    is_steam_game = game.appid is not None
+    if is_steam_game:
+        steam_appid_str = str(game.appid)
+        if not game.store_url:
+            game.store_url = settings.STEAM_STORE_PAGE_BASE_URL + steam_appid_str
+            game.save()
+
+        # Fetch to set/update details.
+        url = settings.STEAM_API_BASE_URL_APPDETAILS + steam_appid_str
+        response = requests.get(url)
+        data = response.json()[steam_appid_str]["data"]
+
+        screenshots = data.get("screenshots", [])
+        if game.image_url == "" and screenshots:
+            first_thumbnail = screenshots[0]["path_thumbnail"]
+            game.image_url = first_thumbnail
+
+        game.is_free = data["is_free"]
         game.save()
-
-    # Fetch to set/update details.
-    url = settings.STEAM_API_BASE_URL_APPDETAILS + appid
-    response = requests.get(url)
-    data = response.json()[appid]["data"]
-
-    screenshots = data.get("screenshots", [])
-    if game.image_url == "" and screenshots:
-        first_thumbnail = screenshots[0]["path_thumbnail"]
-        game.image_url = first_thumbnail
-
-    game.is_free = data["is_free"]
-    game.save()
 
     event.games.add(game)
     return redirect(reverse("event-detail", kwargs={"uuid": uuid}))
