@@ -19,7 +19,7 @@ class Event(TimestampedMixin, models.Model):
 
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=256)
-    details = models.TextField(default="")
+    details = models.TextField(default="", blank=True)
     date = models.DateField(default=date.today, blank=True, null=True)
     games = models.ManyToManyField("Game", blank=True)
     read_only = models.BooleanField(default=False)
