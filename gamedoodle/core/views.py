@@ -1,3 +1,4 @@
+import requests
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.http import HttpRequest, HttpResponse
@@ -5,7 +6,6 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import generic
 
-import requests
 from gamedoodle.core.models import Event, Game, Vote
 
 
@@ -128,14 +128,16 @@ def add_game(request, uuid):
     event = Event.objects.get(uuid=uuid)
 
     search_text = request.GET.get("q", "").strip()
-    games = []
+    steam_games = []
     if search_text:
-        games = Game.objects.filter(name__icontains=search_text).order_by("name")[:100]
+        steam_games = Game.objects.filter(
+            appid__isnull=False, name__icontains=search_text
+        ).order_by("name")[:100]
 
     return render(
         request,
         "core/event_add_game.html",
-        {"event": event, "steam_games": games, "search_text": search_text},
+        {"event": event, "steam_games": steam_games, "search_text": search_text},
     )
 
 
