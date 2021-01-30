@@ -3,7 +3,7 @@
 {% block content %}
 <div
   style="
-    height: 100vh;
+    height: 80vh;
     display: flex;
     align-items: center;
   "
@@ -24,14 +24,17 @@
       "
     >
 
+      <label for="username-input">
+        Before we move on,<br>
+        what is your name?
+      </label>
       <div
         class="nes-field"
-        style="position: relative;"
+        style="
+          position: relative;
+          {% if existing_usernames %}width: calc(100% - 60px);{% endif %}
+        "
       >
-        <label for="username-input">
-          Before we move on,<br>
-          what is your name?
-        </label>
         <input
           id="username-input"
           type="text"
@@ -46,11 +49,12 @@
         >
         {% if existing_usernames %}
         <div
+          id="existing-usernames-select-wrapper"
           class="nes-select"
           style="
             position: absolute;
-            top: 60px;
-            right: -48px;
+            right: -52px;
+            bottom: 4px;
             z-index: 1;
           "
         >
