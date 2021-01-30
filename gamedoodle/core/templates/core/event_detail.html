@@ -20,7 +20,7 @@
   <div
     style="
       text-align: center;
-      margin-bottom: 32px;
+      margin-bottom: 24px;
     "
   >
     <p>
@@ -60,11 +60,14 @@
         flex-wrap: wrap;
         justify-content: center;
         align-items: center;
-        margin-bottom: 32px;
+        margin-top: 8px;
+        margin-bottom: 24px;
+        padding: 16px;
+        outline: 4px solid rgba(0, 0, 0, 0.08);
+        background-color: white;
       "
     >
       <div
-        class="nes-container is-rounded with-title"
         style="
           flex-grow: 1;
           display: flex;
@@ -76,6 +79,8 @@
         <div
           class="title"
           style="
+            margin-top: 8px;
+            margin-bottom: 8px;
             margin-right: auto;
             position: relative;
             top: -8px;
@@ -105,7 +110,6 @@
           </a>
           {% endif %}
         </div>
-
 
         {% if game.image_url %}
         <div style="flex-grow: 1">
