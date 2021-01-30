@@ -54,9 +54,18 @@
               <a
                 class="nes-text is-error"
                 href="{% url "logout" %}?next={{ request.path|urlencode }}"
+                style="margin-right: 8px"
               >
                 Logout
               </a>
+              {% block navbar_left_extra %}
+              <a
+                class="nes-text is-disabled nes-pointer"
+                href="{% url "admin:index" %}"
+              >
+                Admin
+              </a>
+              {% endblock %}
             </div>
             {% endblock %}
           </div>
