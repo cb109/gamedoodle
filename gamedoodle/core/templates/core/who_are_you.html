@@ -24,19 +24,53 @@
       "
     >
 
-      <div class="nes-field">
-        <label for="username-field">
+      <div
+        class="nes-field"
+        style="position: relative;"
+      >
+        <label for="username-input">
           Before we move on,<br>
           what is your name?
         </label>
         <input
+          id="username-input"
           type="text"
           name="username"
-          id="username-field"
           required
           class="nes-input"
-          style="margin-top: 16px;"
+          style="
+            position: relative;
+            margin-top: 16px;
+            z-index: 2;
+          "
         >
+        {% if existing_usernames %}
+        <div
+          class="nes-select"
+          style="
+            position: absolute;
+            top: 60px;
+            right: -48px;
+            z-index: 1;
+          "
+        >
+          <select
+            id="existing-usernames-select"
+            style="
+              border: none;
+              border-image: none;
+              background: none;
+            "
+            onchange="populateInputFromSelectedUsername()"
+          >
+            {% for existing_username in existing_usernames %}
+            <option value="{{ existing_username }}">
+              {{ existing_username }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        {% endif %}
       </div>
       <button
         type="submit"
@@ -48,4 +82,14 @@
     </div>
   </form>
 </div>
+
+<script>
+
+function populateInputFromSelectedUsername() {
+  var usernameSelect = document.getElementById('existing-usernames-select');
+  var usernameInput = document.getElementById('username-input')
+  usernameInput.value = usernameSelect.value;
+}
+
+</script>
 {% endblock %}
