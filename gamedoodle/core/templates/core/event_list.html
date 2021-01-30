@@ -1,0 +1,23 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<h2 class="nes-text is-primary">Recent Events</h2>
+<ul style="list-style: none; margin-top: 24px;">
+  {% for event in events %}
+  <li style="margin-bottom: 8px;">
+    <span class="nes-text is-disabled">{{ event.created_at|date:"d.m.Y" }}</span>
+    <a
+      href="{% url 'event-detail' event.uuid %}"
+      {% if event.read_only %}
+      class="nes-text is-warning"
+      title="Event is in read-only mode"
+      {% endif %}
+    >
+      {{ event.name }}
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+
+{% endblock%}

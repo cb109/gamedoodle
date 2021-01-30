@@ -5,7 +5,6 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import generic
-
 from gamedoodle.core.models import Event, Game, Vote
 
 
@@ -58,6 +57,21 @@ def who_are_you(request):
         return redirect(next_url)
 
     return render(request, "core/who_are_you.html")
+
+
+class EventListView(generic.ListView):
+    model = Event
+    queryset = Event.objects.filter(listed=True).order_by("-created_at")[:10]
+
+    @username_required
+    def get(self, request, *args, **kargs):
+        return super().get(request, *args, **kargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["username"] = _get_username(self.request)
+        context["events"] = self.get_queryset()
+        return context
 
 
 class EventDetailView(generic.DetailView):

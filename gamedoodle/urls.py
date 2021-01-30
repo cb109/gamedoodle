@@ -35,4 +35,6 @@ urlpatterns = [
         views.add_game_manually,
         name="event-add-game-manually",
     ),
+    path("events/", views.EventListView.as_view(), name="event-list"),
+    path("", views.EventListView.as_view(), name="event-list-fallback"),
 ]

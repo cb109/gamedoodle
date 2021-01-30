@@ -23,6 +23,7 @@ class Event(TimestampedMixin, models.Model):
     date = models.DateField(default=date.today, blank=True, null=True)
     games = models.ManyToManyField("Game", blank=True)
     read_only = models.BooleanField(default=False)
+    listed = models.BooleanField(default=True)
 
     def __str__(self):
         date_str = "no date yet"

@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import mark_safe
-
 from gamedoodle.core.models import Event, Game, Vote
 
 
@@ -10,6 +9,7 @@ class EventAdmin(admin.ModelAdmin):
         "name",
         "date",
         "writable",
+        "listed",
         "gameslist",
         "uuid",
         "created_at",
