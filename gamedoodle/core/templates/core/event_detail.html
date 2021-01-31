@@ -2,11 +2,27 @@
 
 {% block navbar_left %}
 <a
-  class="nes-text is-success nes-pointer"
+  class="nes-text is-success"
   href="{% url "event-add-game" uuid=event.uuid %}"
 >
   + Add Game
 </a>
+<div style="display: flex; flex-wrap: wrap;">
+  <a
+    href="{% url "event-list" %}"
+    class="nes-text is-disabled"
+    style="margin-left: 32px;"
+  >
+    Events
+  </a>
+  <a
+    href="{% url "admin:index" %}"
+    class="nes-text is-disabled nes-pointer"
+    style="margin-left: 32px;"
+  >
+    Admin
+  </a>
+</div>
 {% endblock %}
 
 {% block content %}

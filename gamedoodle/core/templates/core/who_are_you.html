@@ -23,7 +23,11 @@
         align-items: center;
       "
     >
-
+      {% if event %}
+      <h4 class="nes-text is-primary">
+        {{ event.name }}
+      </h4>
+      {% endif %}
       <label for="username-input">
         Before we move on,<br>
         what is your name?
