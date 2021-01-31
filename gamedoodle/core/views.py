@@ -63,6 +63,7 @@ def who_are_you(request):
     # and offer them to choose by the User, so it's easier to reuse
     # the same one across multiple devices.
     existing_usernames = []
+    event = None
     try:
         match = resolve(next_url)
         if match.url_name == "event-detail":
@@ -78,7 +79,9 @@ def who_are_you(request):
         pass
 
     return render(
-        request, "core/who_are_you.html", {"existing_usernames": existing_usernames}
+        request,
+        "core/who_are_you.html",
+        {"event": event, "existing_usernames": existing_usernames},
     )
 
 
