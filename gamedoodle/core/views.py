@@ -100,6 +100,17 @@ class EventListView(generic.ListView):
         return context
 
 
+def calculate_votes_value_for_event_and_game(game, event):
+    value = game.votes.count()
+    if game.votes.filter(is_superlike=True).exists():
+        num_event_participants = (
+            event.vote_set.all().values_list("username", flat=True).distinct().count()
+        )
+        fraction = 1 / num_event_participants
+        value += sum([fraction for _ in game.votes.filter(is_superlike=True)])
+    return value
+
+
 class EventDetailView(generic.DetailView):
     model = Event
     slug_url_kwarg = "uuid"
@@ -120,6 +131,7 @@ class EventDetailView(generic.DetailView):
         for game in games:
             votes = Vote.objects.filter(game=game, event=event).order_by("username")
             game.votes = votes
+            game.votes_value = calculate_votes_value_for_event_and_game(game, event)
             game.current_user_can_vote = not votes.filter(username=username).exists()
             game.current_user_can_superlike = (
                 votes.filter(username=username, is_superlike=False).exists()
