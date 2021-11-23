@@ -62,7 +62,15 @@ class GameAdmin(admin.ModelAdmin):
 
 
 class VoteAdmin(admin.ModelAdmin):
-    list_display = ("username", "event", "game", "created_at", "modified_at", "id")
+    list_display = (
+        "username",
+        "event",
+        "game",
+        "is_superlike",
+        "created_at",
+        "modified_at",
+        "id",
+    )
     autocomplete_fields = ("event", "game")
 
 

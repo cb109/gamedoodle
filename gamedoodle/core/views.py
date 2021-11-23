@@ -121,6 +121,12 @@ class EventDetailView(generic.DetailView):
             votes = Vote.objects.filter(game=game, event=event).order_by("username")
             game.votes = votes
             game.current_user_can_vote = not votes.filter(username=username).exists()
+            game.current_user_can_superlike = (
+                votes.filter(username=username, is_superlike=False).exists()
+                and not Vote.objects.filter(
+                    event=event, username=username, is_superlike=True
+                ).exists()
+            )
 
         games = sorted(
             games, key=lambda game: f"{len(game.votes)}-{game.name}", reverse=True
@@ -153,6 +159,14 @@ def vote_game(request, uuid):
     game_id = request.POST.get("game_id")
     if game_id:
         Vote.objects.get_or_create(event=event, game_id=game_id, username=username)
+
+    superlike_game_id = request.POST.get("superlike_game_id")
+    if superlike_game_id:
+        vote = Vote.objects.get(
+            event=event, game_id=superlike_game_id, username=username
+        )
+        vote.is_superlike = True
+        vote.save()
 
     return redirect(reverse("event-detail", kwargs={"uuid": uuid}))
 

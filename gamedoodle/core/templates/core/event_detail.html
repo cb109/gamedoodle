@@ -176,19 +176,21 @@
                 {% endif %}
                 onclick="document.getElementById('btn-vote-{{ game.id }}').click()"
               >
-                x
-                <button
+                x<button
                   id="btn-vote-{{ game.id }}"
                   type="submit"
                   name="vote_id"
                   value="{{ vote.id }}"
                   {% if event.read_only %}disabled{% endif %}
                   style="display: none;"
-                ></button>
-              </span>
-              {% endif %}
-              <span class="nes-text is-success">
-                {{ vote.username }}</span>{% if not forloop.last %}, {% endif %}
+                ></button></span>{% endif %}<span
+                class="nes-text is-success"
+                style="margin-left: 8px"
+              >{{ vote.username }}{% if vote.is_superlike %}<i
+                class="nes-icon star"
+                style="margin-left: 8px"
+                title="This is a super-like vote, making this count a little more than a normal vote"
+              ></i>{% endif %}</span>{% if not forloop.last %}, {% endif %}
             </span>
           </button>
           {% endfor %}
@@ -217,6 +219,33 @@
             "
           >
             <i class="nes-icon is-medium like"></i>
+          </button>
+        </div>
+        {% endif %}
+
+        {% if game.current_user_can_superlike %}
+        <div
+          style="
+            display: flex;
+            margin-left: 8px;
+            margin-bottom: 16px;
+          "
+        >
+          <button
+            type="submit"
+            value="{{ game.id }}"
+            name="superlike_game_id"
+            class="nes-btn {% if event.read_only %}is-disabled{% endif %}"
+            {% if event.read_only %}
+            title="Event is in read-only mode"
+            disabled
+            {% endif %}
+            title="Make your vote count extra!"
+            style="
+              max-height: 72px;
+            "
+          >
+            <i class="nes-icon is-medium star"></i>
           </button>
         </div>
         {% endif %}
