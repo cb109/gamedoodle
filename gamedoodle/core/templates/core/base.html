@@ -11,6 +11,20 @@
     <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
     <link href="https://unpkg.com/nes.css@2.3.0/css/nes.min.css" rel="stylesheet" />
   </head>
+  <script>
+    // Remember scroll position across page reloads
+    // https://stackoverflow.com/a/62881829
+    document.addEventListener("DOMContentLoaded", function (event) {
+      var scrollpos = sessionStorage.getItem('scrollpos');
+      if (scrollpos) {
+        window.scrollTo(0, scrollpos);
+        sessionStorage.removeItem('scrollpos');
+      }
+    });
+    window.addEventListener("beforeunload", function (e) {
+      sessionStorage.setItem('scrollpos', window.scrollY);
+    });
+  </script>
   <style>
     body {
       margin: 20px;
