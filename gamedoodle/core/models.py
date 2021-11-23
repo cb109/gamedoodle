@@ -55,6 +55,7 @@ class Vote(TimestampedMixin, models.Model):
     event = models.ForeignKey("Event", on_delete=models.CASCADE)
     game = models.ForeignKey("Game", on_delete=models.CASCADE)
     username = models.CharField(max_length=256)
+    is_superlike = models.BooleanField(default=False)
 
     class Meta:
         constraints = [

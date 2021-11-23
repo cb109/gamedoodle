@@ -100,6 +100,17 @@ class EventListView(generic.ListView):
         return context
 
 
+def calculate_votes_value_for_event_and_game(game, event):
+    value = game.votes.count()
+    if game.votes.filter(is_superlike=True).exists():
+        num_event_participants = (
+            event.vote_set.all().values_list("username", flat=True).distinct().count()
+        )
+        fraction = 1 / num_event_participants
+        value += sum([fraction for _ in game.votes.filter(is_superlike=True)])
+    return value
+
+
 class EventDetailView(generic.DetailView):
     model = Event
     slug_url_kwarg = "uuid"
@@ -120,16 +131,23 @@ class EventDetailView(generic.DetailView):
         for game in games:
             votes = Vote.objects.filter(game=game, event=event).order_by("username")
             game.votes = votes
+            game.votes_value = calculate_votes_value_for_event_and_game(game, event)
             game.current_user_can_vote = not votes.filter(username=username).exists()
+            game.current_user_can_superlike = (
+                votes.filter(username=username, is_superlike=False).exists()
+                and not Vote.objects.filter(
+                    event=event, username=username, is_superlike=True
+                ).exists()
+            )
 
         games = sorted(
-            games, key=lambda game: f"{len(game.votes)}-{game.name}", reverse=True
+            games, key=lambda game: f"{game.votes_value}-{game.name}", reverse=True
         )
-        sorted_unique_num_votes = sorted(
-            list(set([len(game.votes) for game in games])), reverse=True
+        sorted_unique_votes_value = sorted(
+            list(set([game.votes_value for game in games])), reverse=True
         )
         for game in games:
-            game.voting_rank = sorted_unique_num_votes.index(len(game.votes)) + 1
+            game.voting_rank = sorted_unique_votes_value.index(game.votes_value) + 1
 
         context["username"] = username
         context["games"] = games
@@ -150,9 +168,24 @@ def vote_game(request, uuid):
         if vote.username == username:
             vote.delete()
 
+    superlike_vote_id = request.POST.get("superlike_vote_id")
+    if superlike_vote_id:
+        vote = Vote.objects.get(id=superlike_vote_id)
+        if vote.username == username:
+            vote.is_superlike = False
+            vote.save()
+
     game_id = request.POST.get("game_id")
     if game_id:
         Vote.objects.get_or_create(event=event, game_id=game_id, username=username)
+
+    superlike_game_id = request.POST.get("superlike_game_id")
+    if superlike_game_id:
+        vote = Vote.objects.get(
+            event=event, game_id=superlike_game_id, username=username
+        )
+        vote.is_superlike = True
+        vote.save()
 
     return redirect(reverse("event-detail", kwargs={"uuid": uuid}))
 
