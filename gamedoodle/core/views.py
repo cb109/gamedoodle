@@ -156,6 +156,13 @@ def vote_game(request, uuid):
         if vote.username == username:
             vote.delete()
 
+    superlike_vote_id = request.POST.get("superlike_vote_id")
+    if superlike_vote_id:
+        vote = Vote.objects.get(id=superlike_vote_id)
+        if vote.username == username:
+            vote.is_superlike = False
+            vote.save()
+
     game_id = request.POST.get("game_id")
     if game_id:
         Vote.objects.get_or_create(event=event, game_id=game_id, username=username)
