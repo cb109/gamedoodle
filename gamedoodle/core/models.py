@@ -48,6 +48,17 @@ class Game(TimestampedMixin, models.Model):
     def __str__(self):
         return f"{self.name} ({self.appid})"
 
+    @property
+    def votes_value(self):
+        value = self.votes.count()
+        if self.votes.filter(is_superlike=True).exists():
+            num_participants = (
+                self.votes.values_list("username", flat=True).distinct().count()
+            )
+            fraction = 1 / num_participants
+            value += sum([fraction for _ in self.votes.filter(is_superlike=True)])
+        return value
+
 
 class Vote(TimestampedMixin, models.Model):
     """A User votes to play a Game during a certain Event."""

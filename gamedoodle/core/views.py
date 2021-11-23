@@ -129,13 +129,13 @@ class EventDetailView(generic.DetailView):
             )
 
         games = sorted(
-            games, key=lambda game: f"{len(game.votes)}-{game.name}", reverse=True
+            games, key=lambda game: f"{game.votes_value}-{game.name}", reverse=True
         )
-        sorted_unique_num_votes = sorted(
-            list(set([len(game.votes) for game in games])), reverse=True
+        sorted_unique_votes_value = sorted(
+            list(set([game.votes_value for game in games])), reverse=True
         )
         for game in games:
-            game.voting_rank = sorted_unique_num_votes.index(len(game.votes)) + 1
+            game.voting_rank = sorted_unique_votes_value.index(game.votes_value) + 1
 
         context["username"] = username
         context["games"] = games
