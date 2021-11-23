@@ -1,4 +1,5 @@
 django
+django-easy-audit
 gunicorn
 pip-tools
 requests
