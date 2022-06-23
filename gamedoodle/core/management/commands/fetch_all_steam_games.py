@@ -9,19 +9,17 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         response = requests.get(settings.STEAM_API_URL_GET_APP_LIST)
         data = response.json()
+
         apps = data["applist"]["apps"]
+        app_id_to_name = {app["appid"]: app["name"].strip() for app in apps}
 
-        fixed_name = app["name"]
+        fetched_app_ids = [app["appid"] for app in apps]
+        existing_app_ids = Game.objects.all().values_list("appid", flat=True)
+        new_app_ids = set(fetched_app_ids) - set(existing_app_ids)
 
-        if Game.objects.count() == 0:
-            games = [Game(appid=app["appid"], name=fixed_name) for app in apps]
-            Game.objects.bulk_create(games)
-        else:
-            for i, app in enumerate(apps):
-                print(i + 1, len(apps))
-                Game.objects.get_or_create(
-                    appid=app["appid"],
-                    name=fixed_name,
-                    store_url=settings.STEAM_STORE_PAGE_BASE_URL + app["appid"],
-                )
-        print("done")
+        games = [
+            Game(appid=app_id, name=app_id_to_name[app_id]) for app_id in new_app_ids
+        ]
+        print(f"Fetched {len(games)} new games...")
+        Game.objects.bulk_create(games)
+        print("Done")
