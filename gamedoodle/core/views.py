@@ -5,7 +5,7 @@ from django.http import HttpRequest
 from django.shortcuts import redirect, render
 from django.urls import resolve, reverse
 from django.views import generic
-from gamedoodle.core.models import Event, Game, Vote
+from gamedoodle.core.models import Event, EventSubscription, Game, Vote
 
 
 def _get_username(request):
@@ -152,6 +152,40 @@ class EventDetailView(generic.DetailView):
         context["username"] = username
         context["games"] = games
         return context
+
+
+@username_required
+def setup_email_notifications(request, uuid):
+    """Setup email notifications for this event.
+
+    Will send a short heads-up to given email address if something has
+    changed on this event, e.g. a Game has been added or a new Vote.
+
+    """
+    event = Event.objects.get(uuid=uuid)
+    return render(
+        request, "core/event_setup_email_notifications.html", {"event": event}
+    )
+
+
+@username_required
+def subscribe_to_email_notifications(request, uuid):
+    event = Event.objects.get(uuid=uuid)
+    email = request.POST["email"].strip()
+    username = _get_username(request)
+
+    subscription, created = EventSubscription.objects.get_or_create(
+        event=event, email=email
+    )
+    if created and username:
+        subscription.username = username
+        subscription.save(update_fields=["username"])
+
+    return render(
+        request,
+        "core/event_setup_email_notifications.html",
+        {"event": event, "email": email, "subscribed": True},
+    )
 
 
 @username_required
