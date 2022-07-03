@@ -194,6 +194,9 @@ def subscribe_to_email_notifications(request, uuid):
     confirmation_url = request.build_absolute_uri(
         reverse("event-notifications-confirm", args=[subscription.id])
     )
+    unsubscription_url = request.build_absolute_uri(
+        reverse("event-notifications-unsubscribe", args=[subscription.id])
+    )
 
     send_email_via_gmail(
         recipient=email,
@@ -202,7 +205,9 @@ def subscribe_to_email_notifications(request, uuid):
             f"""
             Please click this link to activate notifications: {confirmation_url}
 
-            Go to Event: {event_url}
+            Go to event: {event_url}
+
+            Unsubscribe from these notifications: {unsubscription_url}
         """
         ),
     )

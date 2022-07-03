@@ -5,7 +5,12 @@ from gamedoodle.core.models import Event, EventSubscription, Game, Vote
 
 
 class EventSubscriptionAdmin(admin.ModelAdmin):
-    list_display = ("event", "email", "username", "active")
+    list_display = (
+        "event",
+        "active",
+        "email",
+        "username",
+    )
 
 
 class EventAdmin(admin.ModelAdmin):
