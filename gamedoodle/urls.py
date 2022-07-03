@@ -26,6 +26,26 @@ urlpatterns = [
     path("events/<uuid:uuid>/votegame", views.vote_game, name="event-vote-game"),
     path("events/<uuid:uuid>/addgame", views.add_game, name="event-add-game"),
     path(
+        "events/<uuid:uuid>/notifications",
+        views.setup_email_notifications,
+        name="event-notifications-setup",
+    ),
+    path(
+        "events/<uuid:uuid>/notifications/subscribe",
+        views.subscribe_to_email_notifications,
+        name="event-notifications-subscribe",
+    ),
+    path(
+        "notifications/<uuid:subscription_uuid>/confirm",
+        views.confirm_email_notifications,
+        name="event-notifications-confirm",
+    ),
+    path(
+        "notifications/<uuid:subscription_uuid>/unsubscribe",
+        views.unsubscribe_email_notifications,
+        name="event-notifications-unsubscribe",
+    ),
+    path(
         "events/<uuid:uuid>/addgame/matching",
         views.add_matching_game,
         name="event-add-matching-game",

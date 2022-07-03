@@ -1,0 +1,61 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div
+  style="
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  "
+>
+  <h2>
+   Receive email notifications for <a href="{% url "event-detail" uuid=event.uuid %}">{{ event.name }}</a>
+  </h2>
+  {% if subscribed %}
+  <div class="nes-text is-success" style="margin-top: 16px">
+    <p>You will receive event activity notifications to: <strong>{{ email }}</strong>.</p>
+    <p>Please check your emails and confirm the subscription.</p>
+  </div>
+  {% else %}
+  <form
+    method="POST"
+    action="{% url "event-notifications-subscribe" uuid=event.uuid %}"
+    style="margin-top: 16px"
+  >
+    {% csrf_token %}
+
+    <div
+      style="
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      "
+    >
+      <label>
+        Email
+        <input
+          type="email"
+          class="nes-input"
+          name="email"
+          required
+          style="width: 100%"
+        >
+      </label>
+      <button
+        id="subscribe-btn"
+        type="submit"
+        class="nes-btn {% if event.read_only %}is-disabled{% else %}is-success{% endif %}"
+        {% if event.read_only %}
+        title="Event is in read-only mode"
+        disabled
+        {% endif %}
+        style="margin-left: auto"
+        onclick="document.getElementById('subscribe-btn').innerHTML = 'Subscribing ...'"
+      >
+        Subscribe
+      </button>
+    </div>
+  </form>
+  {% endif %}
+</div>
+{% endblock%}

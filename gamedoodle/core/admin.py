@@ -1,7 +1,16 @@
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import mark_safe
-from gamedoodle.core.models import Event, Game, Vote
+from gamedoodle.core.models import Event, EventSubscription, Game, Vote
+
+
+class EventSubscriptionAdmin(admin.ModelAdmin):
+    list_display = (
+        "event",
+        "active",
+        "email",
+        "username",
+    )
 
 
 class EventAdmin(admin.ModelAdmin):
@@ -75,5 +84,6 @@ class VoteAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Event, EventAdmin)
+admin.site.register(EventSubscription, EventSubscriptionAdmin)
 admin.site.register(Game, GameAdmin)
 admin.site.register(Vote, VoteAdmin)

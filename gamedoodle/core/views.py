@@ -1,11 +1,16 @@
+import textwrap
+
 import requests
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.http import HttpRequest
 from django.shortcuts import redirect, render
+from django.urls import NoReverseMatch
 from django.urls import resolve, reverse
 from django.views import generic
-from gamedoodle.core.models import Event, Game, Vote
+
+from gamedoodle.core.models import Event, EventSubscription, Game, Vote
+from gamedoodle.core.mailing import send_email_via_gmail
 
 
 def _get_username(request):
@@ -47,9 +52,6 @@ def logout(request):
     request.session.flush()
     next_url = request.GET["next"]
     return redirect(next_url)
-
-
-from django.urls import NoReverseMatch
 
 
 def who_are_you(request):
@@ -127,6 +129,9 @@ class EventDetailView(generic.DetailView):
         username = _get_username(self.request)
         games = list(event.games.all())
 
+        subscribed = self.request.GET.get("subscribed") == "true"
+        unsubscribed = self.request.GET.get("unsubscribed") == "true"
+
         # Augment the instances
         for game in games:
             votes = Vote.objects.filter(game=game, event=event).order_by("username")
@@ -151,7 +156,85 @@ class EventDetailView(generic.DetailView):
 
         context["username"] = username
         context["games"] = games
+
+        context["subscribed"] = subscribed
+        context["unsubscribed"] = unsubscribed
+
         return context
+
+
+@username_required
+def setup_email_notifications(request, uuid):
+    """Setup email notifications for this event.
+
+    Will send a short heads-up to given email address if something has
+    changed on this event, e.g. a Game has been added or a new Vote.
+
+    """
+    event = Event.objects.get(uuid=uuid)
+    return render(
+        request, "core/event_setup_email_notifications.html", {"event": event}
+    )
+
+
+@username_required
+def subscribe_to_email_notifications(request, uuid):
+    event = Event.objects.get(uuid=uuid)
+    email = request.POST["email"].strip()
+    username = _get_username(request)
+
+    subscription, created = EventSubscription.objects.get_or_create(
+        event=event, email=email
+    )
+    if created and username:
+        subscription.username = username
+        subscription.save(update_fields=["username"])
+
+    event_url = request.build_absolute_uri(reverse("event-detail", args=[event.uuid]))
+    confirmation_url = request.build_absolute_uri(
+        reverse("event-notifications-confirm", args=[subscription.uuid])
+    )
+    unsubscription_url = request.build_absolute_uri(
+        reverse("event-notifications-unsubscribe", args=[subscription.uuid])
+    )
+
+    send_email_via_gmail(
+        recipient=email,
+        subject=f'[gamedoodle] Please confirm subscription for "{event.name}"',
+        body=textwrap.dedent(
+            f"""
+            Please click this link to activate notifications: {confirmation_url}
+
+            Go to event: {event_url}
+
+            Unsubscribe from these notifications: {unsubscription_url}
+        """
+        ),
+    )
+
+    return render(
+        request,
+        "core/event_setup_email_notifications.html",
+        {"event": event, "email": email, "subscribed": True},
+    )
+
+
+def confirm_email_notifications(request, subscription_uuid):
+    subscription = EventSubscription.objects.get(uuid=subscription_uuid)
+    subscription.active = True
+    subscription.save(update_fields=["active"])
+
+    url = reverse("event-detail", args=[subscription.event.uuid]) + "?subscribed=true"
+    return redirect(url)
+
+
+def unsubscribe_email_notifications(request, subscription_uuid):
+    subscription = EventSubscription.objects.get(uuid=subscription_uuid)
+    subscription.active = False
+    subscription.save(update_fields=["active"])
+
+    url = reverse("event-detail", args=[subscription.event.uuid]) + "?unsubscribed=true"
+    return redirect(url)
 
 
 @username_required

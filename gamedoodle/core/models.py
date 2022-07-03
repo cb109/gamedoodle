@@ -36,6 +36,20 @@ class Event(TimestampedMixin, models.Model):
         return not self.read_only
 
 
+class EventSubscription(TimestampedMixin, models.Model):
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    email = models.EmailField(max_length=254)
+    username = models.CharField(max_length=256, default="", blank=True)
+    active = models.BooleanField(default=False)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+
+    def __str__(self):
+        return (
+            f"{self.email} ({self.username})-> "
+            f"{self.event.name} [{'x' if self.active else ' '}]"
+        )
+
+
 class Game(TimestampedMixin, models.Model):
     """A Game on Steam."""
 
