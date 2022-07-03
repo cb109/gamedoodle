@@ -45,7 +45,10 @@
           href="{% url "event-notifications-setup" uuid=event.uuid %}"
           title="Send me email notifications about activity for this event (max. one email per day and only if something has happened)"
         >
-          <i class="nes-icon gmail is-medium" style="filter: grayscale(1)"></i>
+          <i
+            class="nes-icon gmail is-medium"
+            style="filter: grayscale(1);"
+          ></i>
         </a>
       </h1>
       {% if event.date %}
@@ -65,6 +68,11 @@
     {% if event.read_only %}
     <div class="nes-text is-warning">
       Event is in read-only mode and can not be modified!
+    </div>
+    {% endif %}
+    {% if subscribed %}
+    <div class="nes-text is-success">
+      Your email subscription has been confirmed!
     </div>
     {% endif %}
   </div>

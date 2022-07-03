@@ -127,6 +127,8 @@ class EventDetailView(generic.DetailView):
         username = _get_username(self.request)
         games = list(event.games.all())
 
+        subscribed = self.request.GET.get("subscribed") == "true"
+
         # Augment the instances
         for game in games:
             votes = Vote.objects.filter(game=game, event=event).order_by("username")
@@ -151,6 +153,7 @@ class EventDetailView(generic.DetailView):
 
         context["username"] = username
         context["games"] = games
+        context["subscribed"] = subscribed
         return context
 
 
@@ -186,6 +189,15 @@ def subscribe_to_email_notifications(request, uuid):
         "core/event_setup_email_notifications.html",
         {"event": event, "email": email, "subscribed": True},
     )
+
+
+def confirm_email_notifications(request, subscription_id):
+    subscription = EventSubscription.objects.get(id=subscription_id)
+    subscription.active = True
+    subscription.save(update_fields=["active"])
+
+    url = reverse("event-detail", args=[subscription.event.uuid]) + "?subscribed=true"
+    return redirect(url)
 
 
 @username_required
