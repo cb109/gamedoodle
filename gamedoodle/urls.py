@@ -36,12 +36,12 @@ urlpatterns = [
         name="event-notifications-subscribe",
     ),
     path(
-        "notifications/<int:subscription_id>/confirm",
+        "notifications/<uuid:subscription_uuid>/confirm",
         views.confirm_email_notifications,
         name="event-notifications-confirm",
     ),
     path(
-        "notifications/<int:subscription_id>/unsubscribe",
+        "notifications/<uuid:subscription_uuid>/unsubscribe",
         views.unsubscribe_email_notifications,
         name="event-notifications-unsubscribe",
     ),

@@ -41,6 +41,7 @@ class EventSubscription(TimestampedMixin, models.Model):
     email = models.EmailField(max_length=254)
     username = models.CharField(max_length=256, default="", blank=True)
     active = models.BooleanField(default=False)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
 
     def __str__(self):
         return (

@@ -192,10 +192,10 @@ def subscribe_to_email_notifications(request, uuid):
 
     event_url = request.build_absolute_uri(reverse("event-detail", args=[event.uuid]))
     confirmation_url = request.build_absolute_uri(
-        reverse("event-notifications-confirm", args=[subscription.id])
+        reverse("event-notifications-confirm", args=[subscription.uuid])
     )
     unsubscription_url = request.build_absolute_uri(
-        reverse("event-notifications-unsubscribe", args=[subscription.id])
+        reverse("event-notifications-unsubscribe", args=[subscription.uuid])
     )
 
     send_email_via_gmail(
@@ -219,8 +219,8 @@ def subscribe_to_email_notifications(request, uuid):
     )
 
 
-def confirm_email_notifications(request, subscription_id):
-    subscription = EventSubscription.objects.get(id=subscription_id)
+def confirm_email_notifications(request, subscription_uuid):
+    subscription = EventSubscription.objects.get(uuid=subscription_uuid)
     subscription.active = True
     subscription.save(update_fields=["active"])
 
@@ -228,8 +228,8 @@ def confirm_email_notifications(request, subscription_id):
     return redirect(url)
 
 
-def unsubscribe_email_notifications(request, subscription_id):
-    subscription = EventSubscription.objects.get(id=subscription_id)
+def unsubscribe_email_notifications(request, subscription_uuid):
+    subscription = EventSubscription.objects.get(uuid=subscription_uuid)
     subscription.active = False
     subscription.save(update_fields=["active"])
 
