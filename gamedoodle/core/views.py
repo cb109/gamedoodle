@@ -128,6 +128,7 @@ class EventDetailView(generic.DetailView):
         games = list(event.games.all())
 
         subscribed = self.request.GET.get("subscribed") == "true"
+        unsubscribed = self.request.GET.get("unsubscribed") == "true"
 
         # Augment the instances
         for game in games:
@@ -153,7 +154,10 @@ class EventDetailView(generic.DetailView):
 
         context["username"] = username
         context["games"] = games
+
         context["subscribed"] = subscribed
+        context["unsubscribed"] = unsubscribed
+
         return context
 
 
@@ -197,6 +201,15 @@ def confirm_email_notifications(request, subscription_id):
     subscription.save(update_fields=["active"])
 
     url = reverse("event-detail", args=[subscription.event.uuid]) + "?subscribed=true"
+    return redirect(url)
+
+
+def unsubscribe_email_notifications(request, subscription_id):
+    subscription = EventSubscription.objects.get(id=subscription_id)
+    subscription.active = False
+    subscription.save(update_fields=["active"])
+
+    url = reverse("event-detail", args=[subscription.event.uuid]) + "?unsubscribed=true"
     return redirect(url)
 
 

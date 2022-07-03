@@ -41,6 +41,11 @@ urlpatterns = [
         name="event-notifications-confirm",
     ),
     path(
+        "notifications/<int:subscription_id>/unsubscribe",
+        views.unsubscribe_email_notifications,
+        name="event-notifications-unsubscribe",
+    ),
+    path(
         "events/<uuid:uuid>/addgame/matching",
         views.add_matching_game,
         name="event-add-matching-game",

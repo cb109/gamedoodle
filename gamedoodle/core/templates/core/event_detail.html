@@ -74,6 +74,10 @@
     <div class="nes-text is-success">
       Your email subscription has been confirmed!
     </div>
+    {% elif unsubscribed %}
+    <div class="nes-text is-warning">
+      Your email subscription has been removed!
+    </div>
     {% endif %}
   </div>
   <form
