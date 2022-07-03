@@ -42,6 +42,12 @@ class EventSubscription(TimestampedMixin, models.Model):
     username = models.CharField(max_length=256, default="", blank=True)
     active = models.BooleanField(default=False)
 
+    def __str__(self):
+        return (
+            f"{self.email} ({self.username})-> "
+            f"{self.event.name} [{'x' if self.active else ' '}]"
+        )
+
 
 class Game(TimestampedMixin, models.Model):
     """A Game on Steam."""

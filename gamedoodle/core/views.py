@@ -1,11 +1,16 @@
+import textwrap
+
 import requests
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.http import HttpRequest
 from django.shortcuts import redirect, render
+from django.urls import NoReverseMatch
 from django.urls import resolve, reverse
 from django.views import generic
+
 from gamedoodle.core.models import Event, EventSubscription, Game, Vote
+from gamedoodle.core.mailing import send_email_via_gmail
 
 
 def _get_username(request):
@@ -47,9 +52,6 @@ def logout(request):
     request.session.flush()
     next_url = request.GET["next"]
     return redirect(next_url)
-
-
-from django.urls import NoReverseMatch
 
 
 def who_are_you(request):
@@ -187,6 +189,23 @@ def subscribe_to_email_notifications(request, uuid):
     if created and username:
         subscription.username = username
         subscription.save(update_fields=["username"])
+
+    event_url = request.build_absolute_uri(reverse("event-detail", args=[event.uuid]))
+    confirmation_url = request.build_absolute_uri(
+        reverse("event-notifications-confirm", args=[subscription.id])
+    )
+
+    send_email_via_gmail(
+        recipient=email,
+        subject=f'[gamedoodle] Please confirm subscription for "{event.name}"',
+        body=textwrap.dedent(
+            f"""
+            Please click this link to activate notifications: {confirmation_url}
+
+            Go to Event: {event_url}
+        """
+        ),
+    )
 
     return render(
         request,

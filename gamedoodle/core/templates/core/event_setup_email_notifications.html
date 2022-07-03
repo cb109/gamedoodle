@@ -42,6 +42,7 @@
         >
       </label>
       <button
+        id="subscribe-btn"
         type="submit"
         class="nes-btn {% if event.read_only %}is-disabled{% else %}is-success{% endif %}"
         {% if event.read_only %}
@@ -49,6 +50,7 @@
         disabled
         {% endif %}
         style="margin-left: auto"
+        onclick="document.getElementById('subscribe-btn').disabled = true"
       >
         Subscribe
       </button>

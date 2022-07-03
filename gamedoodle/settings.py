@@ -142,3 +142,10 @@ STEAM_API_URL_GET_APP_LIST = (
 )
 STEAM_STORE_PAGE_BASE_URL = "https://store.steampowered.com/app/"  # + appid
 STEAM_API_BASE_URL_APPDETAILS = "https://store.steampowered.com/api/appdetails/?appids="
+
+EMAIL_NOTIFICATIONS = {
+    "GMAIL_SMTP_SERVER": os.environ.get("GMAIL_SMTP_SERVER", "smtp.gmail.com"),
+    "GMAIL_SMTP_PORT": os.environ.get("GMAIL_SMTP_PORT", 587),
+    "GMAIL_USER": os.environ.get("GMAIL_USER", "no-gmail-user-set"),
+    "GMAIL_PWD": os.environ.get("GMAIL_PWD", "no-gmail-password-set"),
+}
