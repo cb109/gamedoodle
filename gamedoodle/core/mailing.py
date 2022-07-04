@@ -6,6 +6,8 @@ from email.mime.text import MIMEText
 
 from django.conf import settings
 
+from gamedoodle.core.models import SentMail
+
 
 def _replace_url_to_link(value):
     urls = re.compile(
@@ -23,6 +25,7 @@ def send_email_via_gmail(
     html: Optional[str] = None,
     auto_break: bool = True,
     auto_links: bool = True,
+    save_to_db: Optional[bool] = True,
 ):
     """Send email using the Google Mail SMTP server.
 
@@ -43,6 +46,8 @@ def send_email_via_gmail(
 
         auto_links (bool): If no html is provided, convert URLs to <a>
             elements when creating html.
+
+        save_to_db (bool): Store emails to database for debugging.
 
     The email will contain a plain/text and an html version.
 
@@ -89,5 +94,14 @@ def send_email_via_gmail(
         server.starttls()
         server.login(gmail_user, gmail_pwd)
         server.sendmail(from_email, to_emails, msg.as_string())
+
+        if save_to_db:
+            SentMail.objects.create(
+                sender=msg["From"],
+                recipient=msg["To"],
+                subject=msg["Subject"],
+                body=body,
+                html=html,
+            )
     finally:
         server.quit()

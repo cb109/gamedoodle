@@ -88,3 +88,11 @@ class Vote(TimestampedMixin, models.Model):
                 f"but tried to vote for {self.game}"
             )
         super().save(*args, **kwargs)
+
+
+class SentMail(TimestampedMixin, models.Model):
+    sender = models.CharField(max_length=256)
+    recipient = models.CharField(max_length=256)
+    subject = models.TextField()
+    body = models.TextField()
+    html = models.TextField()
