@@ -8,6 +8,7 @@ from django.shortcuts import redirect, render
 from django.urls import NoReverseMatch
 from django.urls import resolve, reverse
 from django.views import generic
+from django.views.decorators.http import require_http_methods
 
 from gamedoodle.core.models import Event, EventSubscription, Game, Vote
 from gamedoodle.core.mailing import send_email_via_gmail
@@ -54,6 +55,7 @@ def logout(request):
     return redirect(next_url)
 
 
+@require_http_methods(("GET",))
 def who_are_you(request):
     next_url = request.GET["next"]
 
@@ -163,6 +165,7 @@ class EventDetailView(generic.DetailView):
         return context
 
 
+@require_http_methods(("GET",))
 @username_required
 def setup_email_notifications(request, uuid):
     """Setup email notifications for this event.
@@ -177,6 +180,7 @@ def setup_email_notifications(request, uuid):
     )
 
 
+@require_http_methods(("POST",))
 @username_required
 def subscribe_to_email_notifications(request, uuid):
     event = Event.objects.get(uuid=uuid)
@@ -227,6 +231,7 @@ def subscribe_to_email_notifications(request, uuid):
     )
 
 
+@require_http_methods(("GET",))
 def confirm_email_notifications(request, subscription_uuid):
     subscription = EventSubscription.objects.get(uuid=subscription_uuid)
     subscription.active = True
@@ -236,6 +241,7 @@ def confirm_email_notifications(request, subscription_uuid):
     return redirect(url)
 
 
+@require_http_methods(("GET",))
 def unsubscribe_email_notifications(request, subscription_uuid):
     subscription = EventSubscription.objects.get(uuid=subscription_uuid)
     subscription.active = False
@@ -245,6 +251,7 @@ def unsubscribe_email_notifications(request, subscription_uuid):
     return redirect(url)
 
 
+@require_http_methods(("POST",))
 @username_required
 def vote_game(request, uuid):
     """Handle both voting and unvoting for a Game."""
@@ -281,6 +288,7 @@ def vote_game(request, uuid):
     return redirect(reverse("event-detail", kwargs={"uuid": uuid}))
 
 
+@require_http_methods(("GET",))
 @username_required
 def add_game(request, uuid):
     """Display form to add a Game to an Event.
@@ -305,6 +313,7 @@ def add_game(request, uuid):
     )
 
 
+@require_http_methods(("POST",))
 @username_required
 def add_game_manually(request, uuid):
     """Add actual game as specified."""
@@ -317,7 +326,7 @@ def add_game_manually(request, uuid):
     is_free = request.POST.get("is_free", None) == "on"
 
     # Ensure Game exists.
-    game, created = Game.objects.get_or_create(name=name)
+    game, _ = Game.objects.get_or_create(name=name)
     game.is_free = is_free
     if game.image_url != image_url and image_url.strip() != "":
         game.image_url = image_url
@@ -329,6 +338,7 @@ def add_game_manually(request, uuid):
     return redirect(reverse("event-detail", kwargs={"uuid": uuid}))
 
 
+@require_http_methods(("POST",))
 @username_required
 def add_matching_game(request, uuid):
     """Add actual game selected from Steam search results or an existing one."""
