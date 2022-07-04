@@ -1,3 +1,4 @@
+from typing import Optional
 import re
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -19,17 +20,29 @@ def send_email_via_gmail(
     recipient: str,
     subject: str,
     body: str,
+    html: Optional[str] = None,
     auto_break: bool = True,
     auto_links: bool = True,
 ):
     """Send email using the Google Mail SMTP server.
 
-    Credentials are taken from the Django settings. The pass
+    Credentials are taken from the Django settings.
 
     Args:
+
         recipient (str|list[str]): One or more email addresses to send to.
+
         subject (str): Subject for the email to use.
+
         body (str): Message body of the email.
+
+        html (str): Optional html string instead of creating one from body.
+
+        auto_break (bool): If no html is provided, break newlines as <br>
+            in body when creating html.
+
+        auto_links (bool): If no html is provided, convert URLs to <a>
+            elements when creating html.
 
     The email will contain a plain/text and an html version.
 
@@ -47,20 +60,20 @@ def send_email_via_gmail(
     msg["From"] = from_email
     msg["To"] = ", ".join(to_emails)
 
-    html_body = body
-    if auto_links:
-        html_body = _replace_url_to_link(html_body)
-    if auto_break:
-        html_body = html_body.replace("\n", "<br/>")
-
-    html = f"""
-    <html>
-      <body style="font-family: sans-serif; margin: 20px">
-        <h1>{subject}</h1>
-        {html_body}
-      </body>
-    </html>
-    """
+    if html is None:
+        html_body = body
+        if auto_links:
+            html_body = _replace_url_to_link(html_body)
+        if auto_break:
+            html_body = html_body.replace("\n", "<br/>")
+        html = f"""
+        <html>
+        <body style="font-family: sans-serif; margin: 20px">
+            <h1>{subject}</h1>
+            {html_body}
+        </body>
+        </html>
+        """
 
     # Attach parts into message container.
     # According to RFC 2046, the last part of a multipart message, in

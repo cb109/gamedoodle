@@ -190,7 +190,6 @@ def subscribe_to_email_notifications(request, uuid):
         subscription.username = username
         subscription.save(update_fields=["username"])
 
-    event_url = request.build_absolute_uri(reverse("event-detail", args=[event.uuid]))
     confirmation_url = request.build_absolute_uri(
         reverse("event-notifications-confirm", args=[subscription.uuid])
     )
@@ -205,9 +204,14 @@ def subscribe_to_email_notifications(request, uuid):
             f"""
             Please click this link to activate notifications: {confirmation_url}
 
-            Go to event: {event_url}
-
             Unsubscribe from these notifications: {unsubscription_url}
+        """
+        ),
+        html=textwrap.dedent(
+            f"""
+            Please click <a href="{confirmation_url}">this link to activate</a> notifications.
+
+            If activated already, you can <a href="{unsubscription_url}">unsubscribe here</a>.
         """
         ),
     )
