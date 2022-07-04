@@ -211,7 +211,11 @@ def subscribe_to_email_notifications(request, uuid):
             f"""
             Please click <a href="{confirmation_url}">this link to activate</a> notifications.
 
-            If activated already, you can <a href="{unsubscription_url}">unsubscribe here</a>.
+            <p>
+              <small>
+                If activated already, you can <a href="{unsubscription_url}">unsubscribe here</a>.
+              </small>
+            </p>
         """
         ),
     )

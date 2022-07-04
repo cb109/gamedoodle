@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.sites",
     "django.contrib.messages",
+    "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
     "easyaudit",
     "gamedoodle.core",
@@ -127,6 +128,7 @@ USE_TZ = True
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 STATIC_URL = "/static/"
+STATIC_ROOT = "public/"
 
 # https://github.com/soynatan/django-easy-audit/wiki/Settings
 DJANGO_EASY_AUDIT_WATCH_AUTH_EVENTS = False
