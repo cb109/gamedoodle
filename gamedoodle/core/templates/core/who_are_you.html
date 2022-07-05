@@ -71,6 +71,7 @@
             "
             onchange="populateInputFromSelectedUsername()"
           >
+            <option value="" selected style="display: none">
             {% for existing_username in existing_usernames %}
             <option value="{{ existing_username }}">
               {{ existing_username }}
@@ -95,7 +96,7 @@
 
 function populateInputFromSelectedUsername() {
   var usernameSelect = document.getElementById('existing-usernames-select');
-  var usernameInput = document.getElementById('username-input')
+  var usernameInput = document.getElementById('username-input');
   usernameInput.value = usernameSelect.value;
 }
 
