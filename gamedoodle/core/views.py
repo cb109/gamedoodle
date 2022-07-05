@@ -55,7 +55,7 @@ def logout(request):
     return redirect(next_url)
 
 
-@require_http_methods(("GET",))
+@require_http_methods(("GET", "POST"))
 def who_are_you(request):
     next_url = request.GET["next"]
 
