@@ -1,0 +1,270 @@
+<div
+  id="event-detail-content"
+  style="
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  "
+>
+  <div
+    style="
+      text-align: center;
+      margin-bottom: 24px;
+    "
+  >
+    <p>
+      <h1 class="nes-text is-primary">
+        {{ event.name }} {% if not event.read_only  %}<a
+          href="{% url "event-notifications-setup" uuid=event.uuid %}"
+          title="Send me email notifications about activity for this event (max. one email per day and only if something has happened)"
+        >
+          <i
+            class="nes-icon gmail is-medium"
+            style="filter: grayscale(1);"
+          ></i>
+        </a>{% endif %}
+      </h1>
+      {% if event.date %}
+      <h2 class="nes-text">
+        {{ event.date|date:"l, d.m.Y" }}
+      </h2>
+      {% endif %}
+    </p>
+    {% if event.details %}
+    <p style="word-break: break-word;">
+      {{ event.details|urlize }}
+    </p>
+    {% endif %}
+    <p>
+      Vote which games to play!
+    </p>
+    {% if event.read_only %}
+    <div class="nes-text is-warning">
+      Event is in read-only mode and can not be modified!
+    </div>
+    {% endif %}
+  </div>
+  <form
+    id="form"
+    hx-post="{% url "event-vote-game" uuid=event.uuid %}"
+    hx-target="#event-detail-content"
+  >
+    {% csrf_token %}
+    {% for game in games %}
+    <div
+      style="
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        margin-top: 8px;
+        margin-bottom: 24px;
+        padding: 16px;
+        outline: 4px solid rgba(0, 0, 0, 0.08);
+        background-color: white;
+      "
+    >
+      <div
+        style="
+          flex-grow: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+        "
+      >
+        <div
+          class="title"
+          style="
+            margin-top: 8px;
+            margin-bottom: 8px;
+            margin-right: auto;
+            position: relative;
+            top: -8px;
+          "
+        >
+          {{ game.voting_rank }}.
+          <a
+            href="{{ game.store_url }}"
+            target="_blank"
+            title="Open store page"
+          >
+            {{ game.name }}
+          </a>
+          {% if game.votes.exists %}
+          <span
+            class="nes-text is-success"
+          >
+            &nbsp;+{{ game.votes_value|floatformat }}&nbsp;
+          </span>
+          {% endif %}
+          {% if game.is_free %}
+          <a
+            href="javascript:void(0)"
+            class="nes-badge"
+          >
+            <span class="is-warning">free</span>
+          </a>
+          {% endif %}
+        </div>
+
+        {% if game.image_url %}
+        <div style="flex-grow: 1">
+          {% if game.store_url %}
+          <a
+            href="{{ game.store_url }}"
+            target="_blank"
+            title="Open store page"
+          >
+            <img
+              src="{{ game.image_url }}"
+              style="
+                width: 100%;
+                height: auto;
+                max-width: 720px;
+                max-height: 360px;
+              "
+            >
+          </a>
+          {% else %}
+          <img
+            src="{{ game.image_url }}"
+            style="
+              width: 100%;
+              height: auto;
+              max-height: 400px;
+            "
+          >
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <div
+          style="
+            margin-top: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: baseline;
+          "
+        >
+          {% for vote in game.votes %}
+          <span style="white-space: nowrap">
+            {% if vote.username == username %}
+            <span
+              class="nes-text is-error nes-pointer"
+              style="font-weight: bold"
+              {% if event.read_only %}
+                title="Event is in read-only mode"
+              {% else %}
+                title="Remove your vote for this game"
+              {% endif %}
+              onclick="document.getElementById('btn-vote-{{ vote.id }}').click()"
+            >
+              x<button
+                id="btn-vote-{{ vote.id }}"
+                type="submit"
+                name="vote_id"
+                value="{{ vote.id }}"
+                {% if event.read_only %}disabled{% endif %}
+                style="display: none;"
+              ></button></span>{% endif %}<span
+              class="nes-text {% if vote.username == username %}is-primary{% else %}{% endif %}"
+              style="margin-left: 8px"
+            >{{ vote.username }}{% if vote.is_superlike %}<i
+              class="
+                nes-icon star
+                {% if vote.username == username %}nes-pointer{% endif %}
+              "
+              style="margin-left: 8px"
+              {% if event.read_only %}
+                title="Event is in read-only mode"
+              {% else %}
+                title="This is a super-like vote, making this count a little more. Click to remove the superlike."
+              {% endif %}
+              {% if vote.username == username %}
+              onclick="document.getElementById('btn-superlike-vote-{{ vote.id }}').click()"
+              {% endif %}
+            ></i><button
+              id="btn-superlike-vote-{{ vote.id }}"
+              type="submit"
+              name="superlike_vote_id"
+              value="{{ vote.id }}"
+              {% if event.read_only %}disabled{% endif %}
+              style="display: none;"
+            ></button>{% endif %}</span>{% if not forloop.last %}, {% endif %}
+          </span>
+          {% endfor %}
+        </div>
+
+        {% if game.current_user_can_vote %}
+        <div
+          style="
+            display: flex;
+            margin-left: 8px;
+            margin-bottom: 16px;
+          "
+        >
+          <button
+            type="submit"
+            value="{{ game.id }}"
+            name="game_id"
+            class="nes-btn {% if event.read_only %}is-disabled{% endif %}"
+            {% if event.read_only %}
+            title="Event is in read-only mode"
+            disabled
+            {% endif %}
+            title="Vote for playing this game"
+            style="
+              max-height: 72px;
+            "
+          >
+            <i class="nes-icon is-medium like"></i>
+          </button>
+        </div>
+        {% endif %}
+
+        {% if game.current_user_can_superlike %}
+        <div
+          style="
+            display: flex;
+            margin-left: 8px;
+            margin-bottom: 16px;
+          "
+        >
+          <button
+            type="submit"
+            value="{{ game.id }}"
+            name="superlike_game_id"
+            class="nes-btn {% if event.read_only %}is-disabled{% endif %}"
+            {% if event.read_only %}
+            title="Event is in read-only mode"
+            disabled
+            {% endif %}
+            title="Make this vote count extra with a superlike (you only have one per event)"
+            style="
+              max-height: 72px;
+            "
+          >
+            <i class="nes-icon is-medium star"></i>
+          </button>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+    {% empty %}
+    No games yet
+    {% endfor %}
+  </form>
+
+</div>
+
+{% if subscribed %}
+<script>
+  alert('Your email subscription has been confirmed!');
+</script>
+{% elif unsubscribed %}
+<script>
+  alert('Your email subscription has been removed!');
+</script>
+{% endif %}

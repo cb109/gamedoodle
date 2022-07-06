@@ -124,6 +124,12 @@ class EventDetailView(generic.DetailView):
     def get(self, request, *args, **kargs):
         return super().get(request, *args, **kargs)
 
+    def get_template_names(self):
+        names = ["core/event_detail.html"]
+        if self.request.htmx:
+            names = ["core/event_detail_content.html"]
+        return names
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 

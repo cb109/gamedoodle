@@ -13,23 +13,9 @@
     <script src="https://unpkg.com/htmx.org@1.7.0"></script>
   </head>
   <script>
-    // Remember scroll position across page reloads
-    // https://stackoverflow.com/a/62881829
-    document.addEventListener("DOMContentLoaded", function (event) {
-      var scrollpos = sessionStorage.getItem('scrollpos');
-      if (scrollpos) {
-        window.scrollTo(0, scrollpos);
-        sessionStorage.removeItem('scrollpos');
-      }
-    });
-    window.addEventListener("beforeunload", function (e) {
-      sessionStorage.setItem('scrollpos', window.scrollY);
-    });
-    <script>
-      document.body.addEventListener('htmx:configRequest', (event) => {
-        event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
-      })
-    </script>
+    document.body.addEventListener('htmx:configRequest', (event) => {
+      event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+    })
   </script>
   <style>
     body {
