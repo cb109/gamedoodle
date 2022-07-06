@@ -139,6 +139,7 @@ class EventDetailView(generic.DetailView):
 
         subscribed = self.request.GET.get("subscribed") == "true"
         unsubscribed = self.request.GET.get("unsubscribed") == "true"
+        scroll_to_game_id = self.request.GET.get("game", None)
 
         # Augment the instances
         for game in games:
@@ -167,6 +168,9 @@ class EventDetailView(generic.DetailView):
 
         context["subscribed"] = subscribed
         context["unsubscribed"] = unsubscribed
+
+        if scroll_to_game_id:
+            context["scroll_to_game_id"] = scroll_to_game_id
 
         return context
 
@@ -267,31 +271,43 @@ def vote_game(request, uuid):
     username = _get_username(request)
 
     vote_id = request.POST.get("vote_id")
+    voted_for_game = None
     if vote_id:
         vote = Vote.objects.get(id=vote_id)
+        voted_for_game = vote.game
         if vote.username == username:
             vote.delete()
 
     superlike_vote_id = request.POST.get("superlike_vote_id")
     if superlike_vote_id:
         vote = Vote.objects.get(id=superlike_vote_id)
+        voted_for_game = vote.game
         if vote.username == username:
             vote.is_superlike = False
             vote.save()
 
     game_id = request.POST.get("game_id")
     if game_id:
-        Vote.objects.get_or_create(event=event, game_id=game_id, username=username)
+        vote, _ = Vote.objects.get_or_create(
+            event=event, game_id=game_id, username=username
+        )
+        voted_for_game = vote.game
 
     superlike_game_id = request.POST.get("superlike_game_id")
     if superlike_game_id:
         vote = Vote.objects.get(
             event=event, game_id=superlike_game_id, username=username
         )
+        voted_for_game = vote.game
         vote.is_superlike = True
         vote.save()
 
-    return redirect(reverse("event-detail", kwargs={"uuid": uuid}))
+    url = reverse("event-detail", kwargs={"uuid": uuid})
+    if voted_for_game:
+        query_params = f"?game={voted_for_game.id}"
+        url += query_params
+
+    return redirect(url)
 
 
 @require_http_methods(("GET",))

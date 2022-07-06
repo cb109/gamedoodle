@@ -45,13 +45,14 @@
     {% endif %}
   </div>
   <form
-    id="form"
     hx-post="{% url "event-vote-game" uuid=event.uuid %}"
     hx-target="#event-detail-content"
   >
     {% csrf_token %}
     {% for game in games %}
     <div
+      id="game-{{ game.id }}"
+      class="fade-in"
       style="
         display: flex;
         flex-wrap: wrap;
@@ -266,5 +267,11 @@
 {% elif unsubscribed %}
 <script>
   alert('Your email subscription has been removed!');
+</script>
+{% endif %}
+
+{% if scroll_to_game_id %}
+<script>
+  document.querySelector('#game-{{ scroll_to_game_id }}').scrollIntoView();
 </script>
 {% endif %}
