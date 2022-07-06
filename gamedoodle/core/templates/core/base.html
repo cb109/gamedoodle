@@ -10,6 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
     <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
     <link href="https://unpkg.com/nes.css@2.3.0/css/nes.min.css" rel="stylesheet" />
+    <script src="https://unpkg.com/htmx.org@1.7.0"></script>
   </head>
   <script>
     // Remember scroll position across page reloads
@@ -24,6 +25,11 @@
     window.addEventListener("beforeunload", function (e) {
       sessionStorage.setItem('scrollpos', window.scrollY);
     });
+    <script>
+      document.body.addEventListener('htmx:configRequest', (event) => {
+        event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+      })
+    </script>
   </script>
   <style>
     body {

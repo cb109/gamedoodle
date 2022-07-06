@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
+    "django_htmx",
     "easyaudit",
     "gamedoodle.core",
 ]
@@ -55,6 +56,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_htmx.middleware.HtmxMiddleware",
     "easyaudit.middleware.easyaudit.EasyAuditMiddleware",
 ]
 
@@ -129,6 +131,8 @@ USE_TZ = True
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 STATIC_URL = "/static/"
 STATIC_ROOT = "public/"
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # https://github.com/soynatan/django-easy-audit/wiki/Settings
 DJANGO_EASY_AUDIT_WATCH_AUTH_EVENTS = False

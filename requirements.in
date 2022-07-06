@@ -1,5 +1,6 @@
 django
 django-easy-audit
+django-htmx
 gunicorn
 pip-tools
 requests
