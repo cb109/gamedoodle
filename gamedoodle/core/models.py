@@ -37,6 +37,8 @@ class Event(TimestampedMixin, models.Model):
 
 
 class EventSubscription(TimestampedMixin, models.Model):
+    """A User wants to receive activity notifications about an Event."""
+
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     email = models.EmailField(max_length=254)
     username = models.CharField(max_length=256, default="", blank=True)
@@ -91,6 +93,8 @@ class Vote(TimestampedMixin, models.Model):
 
 
 class SentMail(TimestampedMixin, models.Model):
+    """An email that has been sent to someone."""
+
     sender = models.CharField(max_length=256)
     recipient = models.CharField(max_length=256)
     subject = models.TextField()
