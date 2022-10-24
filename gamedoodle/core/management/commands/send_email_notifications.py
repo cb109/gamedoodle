@@ -9,7 +9,7 @@ from django.urls import reverse
 
 from easyaudit.models import CRUDEvent
 
-from gamedoodle.core.models import EventSubscription, Event, Game
+from gamedoodle.core.models import EventSubscription, Event, Game, Comment
 from gamedoodle.core.mailing import send_email_via_gmail
 
 event_content_type_id = ContentType.objects.get(app_label="core", model="event").id
@@ -29,6 +29,7 @@ class Command(BaseCommand):
 
             # These are not yet filtered for the subscribed Event.
             event_descriptions = []
+
             recent_crud_events = CRUDEvent.objects.filter(
                 datetime__gte=recently,
                 content_type_id__in=[
@@ -67,6 +68,17 @@ class Command(BaseCommand):
 
                 if event == subscription.event:
                     recent_changes_detected = True
+
+            recent_comments = Comment.objects.filter(created_at__gte=recently).order_by(
+                "created_at"
+            )
+            if recent_comments.exists():
+                recent_changes_detected = True
+            for comment in recent_comments:
+                event_descriptions.append(
+                    f"{comment.username} commented on {comment.game.name}: "
+                    f"{comment.short_preview}"
+                )
 
             if recent_changes_detected:
                 event_url = site.domain + reverse("event-detail", args=[event.uuid])

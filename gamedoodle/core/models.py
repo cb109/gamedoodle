@@ -115,6 +115,14 @@ class Comment(TimestampedMixin, models.Model):
             )
         super().save(*args, **kwargs)
 
+    @property
+    def short_preview(self):
+        max_chars = 140
+        shortened = self.text[:max_chars]
+        if shortened != self.text:
+            shortened += "..."
+        return shortened
+
 
 class SentMail(TimestampedMixin, models.Model):
     """An email that has been sent to someone."""
