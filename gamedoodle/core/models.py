@@ -64,6 +64,12 @@ class Game(TimestampedMixin, models.Model):
     def __str__(self):
         return f"{self.name} ({self.appid})"
 
+    def get_votes_for_event(self, event):
+        return Vote.objects.filter(game=self, event=event).order_by("username")
+
+    def get_comments_for_event(self, event):
+        return Comment.objects.filter(game=self, event=event).order_by("-created_at")
+
 
 class Vote(TimestampedMixin, models.Model):
     """A User votes to play a Game during a certain Event."""
