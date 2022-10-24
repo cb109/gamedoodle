@@ -68,7 +68,7 @@ class Game(TimestampedMixin, models.Model):
         return Vote.objects.filter(game=self, event=event).order_by("username")
 
     def get_comments_for_event(self, event):
-        return Comment.objects.filter(game=self, event=event).order_by("-created_at")
+        return Comment.objects.filter(game=self, event=event).order_by("created_at")
 
 
 class Vote(TimestampedMixin, models.Model):
