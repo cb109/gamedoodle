@@ -10,7 +10,7 @@ from django.urls import resolve, reverse
 from django.views import generic
 from django.views.decorators.http import require_http_methods
 
-from gamedoodle.core.models import Event, EventSubscription, Game, Vote
+from gamedoodle.core.models import Event, EventSubscription, Game, Vote, Comment
 from gamedoodle.core.mailing import send_email_via_gmail
 
 
@@ -141,9 +141,10 @@ class EventDetailView(generic.DetailView):
         unsubscribed = self.request.GET.get("unsubscribed") == "true"
         scroll_to_game_id = self.request.GET.get("game", None)
 
-        # Augment the instances
         for game in games:
-            votes = Vote.objects.filter(game=game, event=event).order_by("username")
+            game.comments = game.get_comments_for_event(event)
+
+            votes = game.get_votes_for_event(event)
             game.votes = votes
             game.votes_value = calculate_votes_value_for_event_and_game(game, event)
             game.current_user_can_vote = not votes.filter(username=username).exists()
@@ -308,6 +309,29 @@ def vote_game(request, uuid):
         url += query_params
 
     return redirect(url)
+
+
+@require_http_methods(("GET", "POST"))
+@username_required
+def add_comment(request, uuid):
+    event = Event.objects.get(uuid=uuid)
+    game = Game.objects.get(id=request.GET["game"])
+    game.comments = game.get_comments_for_event(event)
+
+    if request.method == "POST":
+        new_comment = request.POST["new-comment"].strip()
+        if new_comment:
+            Comment.objects.get_or_create(
+                event=event,
+                game=game,
+                username=_get_username(request),
+                text=new_comment,
+            )
+            return redirect(request.build_absolute_uri())
+
+    return render(
+        request, "core/event_add_comment.html", {"event": event, "game": game}
+    )
 
 
 @require_http_methods(("GET",))

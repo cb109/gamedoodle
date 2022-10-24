@@ -64,6 +64,12 @@ class Game(TimestampedMixin, models.Model):
     def __str__(self):
         return f"{self.name} ({self.appid})"
 
+    def get_votes_for_event(self, event):
+        return Vote.objects.filter(game=self, event=event).order_by("username")
+
+    def get_comments_for_event(self, event):
+        return Comment.objects.filter(game=self, event=event).order_by("created_at")
+
 
 class Vote(TimestampedMixin, models.Model):
     """A User votes to play a Game during a certain Event."""
@@ -90,6 +96,32 @@ class Vote(TimestampedMixin, models.Model):
                 f"but tried to vote for {self.game}"
             )
         super().save(*args, **kwargs)
+
+
+class Comment(TimestampedMixin, models.Model):
+    event = models.ForeignKey("Event", on_delete=models.CASCADE)
+    game = models.ForeignKey("Game", on_delete=models.CASCADE)
+    username = models.CharField(max_length=256)
+    text = models.TextField()
+
+    def __str__(self):
+        return f"{self.username} commented on '{self.game}' during '{self.event}'"
+
+    def save(self, *args, **kwargs):
+        if not self.game in self.event.games.all():
+            raise ValidationError(
+                f"Can only comment on game that belongs to event {self.event}, "
+                f"but tried to comment on {self.game}"
+            )
+        super().save(*args, **kwargs)
+
+    @property
+    def short_preview(self):
+        max_chars = 140
+        shortened = self.text[:max_chars]
+        if shortened != self.text:
+            shortened += "..."
+        return shortened
 
 
 class SentMail(TimestampedMixin, models.Model):
