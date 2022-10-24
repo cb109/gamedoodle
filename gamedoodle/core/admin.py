@@ -2,7 +2,14 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import mark_safe
 
-from gamedoodle.core.models import Event, EventSubscription, Game, Vote, SentMail
+from gamedoodle.core.models import (
+    Comment,
+    Event,
+    EventSubscription,
+    Game,
+    SentMail,
+    Vote,
+)
 
 
 class SentMailAdmin(admin.ModelAdmin):
@@ -96,8 +103,22 @@ class VoteAdmin(admin.ModelAdmin):
     autocomplete_fields = ("event", "game")
 
 
+class CommentAdmin(admin.ModelAdmin):
+    list_display = (
+        "username",
+        "event",
+        "game",
+        "text",
+        "created_at",
+        "modified_at",
+        "id",
+    )
+    autocomplete_fields = ("event", "game")
+
+
 admin.site.site_header = "gamedoodle admin"
 
+admin.site.register(Comment, CommentAdmin)
 admin.site.register(Event, EventAdmin)
 admin.site.register(EventSubscription, EventSubscriptionAdmin)
 admin.site.register(Game, GameAdmin)
