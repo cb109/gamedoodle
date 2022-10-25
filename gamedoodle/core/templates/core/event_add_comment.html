@@ -36,7 +36,7 @@
           "
         >
           <div class="nes-balloon from-{% cycle 'left' 'right' %}">
-            <p>{{ comment.text }}</p>
+            <p>{{ comment.text_as_html|safe }}</p>
           </div>
           <div
             class="nes-text is-primary">

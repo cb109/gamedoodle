@@ -1,6 +1,7 @@
 import uuid
 from datetime import date
 
+import bleach
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -114,6 +115,12 @@ class Comment(TimestampedMixin, models.Model):
                 f"but tried to comment on {self.game}"
             )
         super().save(*args, **kwargs)
+
+    @property
+    def text_as_html(self):
+        safe = bleach.clean(self.text)
+        linkified = bleach.linkify(safe)
+        return linkified
 
     @property
     def short_preview(self):
