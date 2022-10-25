@@ -109,11 +109,17 @@ class CommentAdmin(admin.ModelAdmin):
         "event",
         "game",
         "text",
+        "visible",
         "created_at",
         "modified_at",
         "id",
     )
     autocomplete_fields = ("event", "game")
+
+    def visible(self, comment):
+        return not comment.softdeleted
+
+    visible.boolean = True
 
 
 admin.site.site_header = "gamedoodle admin"

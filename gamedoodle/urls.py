@@ -51,6 +51,11 @@ urlpatterns = [
         name="event-add-comment",
     ),
     path(
+        "comments/<int:comment_id>/delete",
+        views.delete_comment,
+        name="delete-comment",
+    ),
+    path(
         "events/<uuid:uuid>/addgame/matching",
         views.add_matching_game,
         name="event-add-matching-game",

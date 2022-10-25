@@ -1,10 +1,11 @@
 import uuid
-from datetime import date
+from datetime import timedelta, date
 
 import bleach
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
 
 
 class TimestampedMixin(models.Model):
@@ -68,8 +69,11 @@ class Game(TimestampedMixin, models.Model):
     def get_votes_for_event(self, event):
         return Vote.objects.filter(game=self, event=event).order_by("username")
 
-    def get_comments_for_event(self, event):
-        return Comment.objects.filter(game=self, event=event).order_by("created_at")
+    def get_comments_for_event(self, event, ignore_softdeleted=True):
+        comments = Comment.objects.filter(game=self, event=event)
+        if ignore_softdeleted:
+            comments = comments.exclude(softdeleted=True)
+        return comments.order_by("created_at")
 
 
 class Vote(TimestampedMixin, models.Model):
@@ -104,6 +108,7 @@ class Comment(TimestampedMixin, models.Model):
     game = models.ForeignKey("Game", on_delete=models.CASCADE)
     username = models.CharField(max_length=256)
     text = models.TextField()
+    softdeleted = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.username} commented on '{self.game}' during '{self.event}'"
@@ -115,6 +120,11 @@ class Comment(TimestampedMixin, models.Model):
                 f"but tried to comment on {self.game}"
             )
         super().save(*args, **kwargs)
+
+    @property
+    def is_new(self):
+        """Created within the last hour."""
+        return self.created_at >= timezone.now() - timedelta(hours=1)
 
     @property
     def text_as_html(self):

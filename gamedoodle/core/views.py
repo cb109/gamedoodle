@@ -314,6 +314,7 @@ def vote_game(request, uuid):
 @require_http_methods(("GET", "POST"))
 @username_required
 def add_comment(request, uuid):
+    username = _get_username(request)
     event = Event.objects.get(uuid=uuid)
     game = Game.objects.get(id=request.GET["game"])
     game.comments = game.get_comments_for_event(event)
@@ -321,17 +322,67 @@ def add_comment(request, uuid):
     if request.method == "POST":
         new_comment = request.POST["new-comment"].strip()
         if new_comment:
-            Comment.objects.get_or_create(
+            Comment.objects.create(
                 event=event,
                 game=game,
-                username=_get_username(request),
+                username=username,
                 text=new_comment,
             )
+            if request.htmx:
+                game.comments = game.get_comments_for_event(event)
+                return render(
+                    request,
+                    "core/event_add_comment_content.html",
+                    {
+                        "event": event,
+                        "game": game,
+                        "username": username,
+                    },
+                )
             return redirect(request.build_absolute_uri())
 
     return render(
-        request, "core/event_add_comment.html", {"event": event, "game": game}
+        request,
+        "core/event_add_comment.html",
+        {
+            "event": event,
+            "game": game,
+            "username": username,
+        },
     )
+
+
+@require_http_methods(("POST",))
+@username_required
+def delete_comment(request, comment_id):
+    username = _get_username(request)
+    comment = Comment.objects.get(id=comment_id)
+    if comment.username != username:
+        raise ValidationError(
+            f"{username} not allowed to delete "
+            f"comment #{comment.id} from {comment.username}"
+        )
+    comment.softdeleted = True
+    comment.save(update_fields=["softdeleted"])
+
+    if request.htmx:
+        game = comment.game
+        game.comments = game.get_comments_for_event(comment.event)
+        return render(
+            request,
+            "core/event_add_comment_content.html",
+            {
+                "event": comment.event,
+                "game": game,
+                "username": username,
+            },
+        )
+
+    add_comment_url = (
+        reverse("event-add-comment", args=(comment.event.uuid,))
+        + f"?game={comment.game.id}"
+    )
+    return redirect(add_comment_url)
 
 
 @require_http_methods(("GET",))
