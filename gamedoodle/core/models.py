@@ -7,6 +7,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
+COMMENT_IS_NEW_THRESHOLD_MINUTES = 60
+
 
 class TimestampedMixin(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -124,7 +126,9 @@ class Comment(TimestampedMixin, models.Model):
     @property
     def is_new(self):
         """Created within the last hour."""
-        return self.created_at >= timezone.now() - timedelta(hours=1)
+        return self.created_at >= timezone.now() - timedelta(
+            hours=COMMENT_IS_NEW_THRESHOLD_MINUTES / 60
+        )
 
     @property
     def text_as_html(self):
