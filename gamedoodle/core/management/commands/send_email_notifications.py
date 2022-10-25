@@ -69,8 +69,10 @@ class Command(BaseCommand):
                 if event == subscription.event:
                     recent_changes_detected = True
 
-            recent_comments = Comment.objects.filter(created_at__gte=recently).order_by(
-                "created_at"
+            recent_comments = (
+                Comment.objects.filter(created_at__gte=recently)
+                .exclude(softdeleted=True)
+                .order_by("created_at")
             )
             if recent_comments.exists():
                 recent_changes_detected = True
