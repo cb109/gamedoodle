@@ -6,7 +6,13 @@
 <ul style="list-style: none; margin-top: 24px;">
   {% for event in events %}
   <li style="margin-bottom: 8px;">
-    <span class="nes-text is-disabled">{{ event.created_at|date:"d.m.Y" }}</span>
+    <span class="nes-text is-disabled">
+      {% if event.date %}
+        {{ event.date|date:"d.m.Y" }}
+      {% else %}
+        {{ event.created_at|date:"d.m.Y" }}
+      {% endif %}
+    </span>
     <a
       href="{% url 'event-detail' event.uuid %}"
       {% if event.read_only %}

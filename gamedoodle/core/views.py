@@ -91,7 +91,7 @@ def who_are_you(request):
 
 class EventListView(generic.ListView):
     model = Event
-    queryset = Event.objects.filter(listed=True).order_by("-created_at")[:10]
+    queryset = Event.objects.filter(listed=True).order_by("-date", "-created_at")[:20]
 
     @username_required
     def get(self, request, *args, **kargs):
