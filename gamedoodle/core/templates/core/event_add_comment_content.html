@@ -42,7 +42,7 @@
               width: 100%;
               display: inline-block;
               text-align: {% if not forloop.counter|divisibleby:2 %}left{% else %}right{% endif %};
-            ">{{ comment.username }} {% if comment.is_new %}
+            ">{{ comment.username }} {% if comment.is_new and not comment.event.read_only %}
               <a
                 hx-post="{% url 'delete-comment' comment.id %}"
                 hx-target="#event-add-comment-content"
@@ -76,6 +76,7 @@
         name="new-comment"
         rows="2"
         required
+        {% if event.read_only %}disabled{% endif %}
       ></textarea>
       <div
         style="
@@ -88,6 +89,7 @@
           type="submit"
           class="nes-btn is-primary"
           style="margin-top: 16px"
+          {% if event.read_only %}disabled{% endif %}
         >
           Add Comment
         </button>
