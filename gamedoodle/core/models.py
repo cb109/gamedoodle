@@ -1,7 +1,10 @@
 import uuid
 from datetime import timedelta, date
+from functools import partial
 
 import bleach
+from bleach import Cleaner
+from bleach.linkifier import LinkifyFilter
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -132,9 +135,22 @@ class Comment(TimestampedMixin, models.Model):
 
     @property
     def text_as_html(self):
-        safe = bleach.clean(self.text)
-        linkified = bleach.linkify(safe)
-        return linkified
+        """Clean, linkify and prevent link overflow.
+
+        See:
+
+        - https://bleach.readthedocs.io/en/latest/linkify.html#linkify-linkifyfilter
+        - https://github.com/mozilla/bleach/blob/24c21bb8a20d0c72a44fee81c290f41774e8384e/bleach/callbacks.py
+
+        """
+
+        def break_word(attrs, new=False):
+            attrs[(None, "style")] = "word-break: break-word"
+            return attrs
+
+        callbacks = bleach.linkifier.DEFAULT_CALLBACKS + [break_word]
+        filters = [partial(LinkifyFilter, callbacks=callbacks)]
+        return Cleaner(filters=filters).clean(self.text)
 
     @property
     def short_preview(self):
