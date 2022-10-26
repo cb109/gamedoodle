@@ -320,6 +320,7 @@ def add_comment(request, uuid):
     game.comments = game.get_comments_for_event(event)
 
     if request.method == "POST":
+        _raise_if_event_not_writable(event)
         new_comment = request.POST["new-comment"].strip()
         if new_comment:
             Comment.objects.create(
@@ -362,6 +363,8 @@ def delete_comment(request, comment_id):
             f"{username} not allowed to delete "
             f"comment #{comment.id} from {comment.username}"
         )
+    _raise_if_event_not_writable(comment.event)
+
     comment.softdeleted = True
     comment.save(update_fields=["softdeleted"])
 
