@@ -33,7 +33,10 @@
             align-items: {% if not forloop.counter|divisibleby:2 %}flex-start{% else %}flex-end{% endif %};
           "
         >
-          <div class="nes-balloon from-{% cycle 'left' 'right' %}">
+          <div
+            class="nes-balloon from-{% cycle 'left' 'right' %}"
+            style="max-width: 800px"
+          >
             <p>{{ comment.text_as_html|safe }}</p>
           </div>
           <div
