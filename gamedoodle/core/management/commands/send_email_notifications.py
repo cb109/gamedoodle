@@ -83,7 +83,9 @@ class Command(BaseCommand):
                 )
 
             if recent_changes_detected:
-                event_url = site.domain + reverse("event-detail", args=[event.uuid])
+                event_url = site.domain + reverse(
+                    "event-detail", args=[subscription.event.uuid]
+                )
                 unsubscription_url = site.domain + reverse(
                     "event-notifications-unsubscribe", args=[subscription.uuid]
                 )
