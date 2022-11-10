@@ -106,7 +106,7 @@ class Command(BaseCommand):
                 send_email_via_gmail(
                     recipient=subscription.email,
                     subject=(
-                        f'[gamedoodle] "{event.name}" has '
+                        f'[gamedoodle] "{subscription.event.name}" has '
                         f"seen some recent activity, check it out"
                     ),
                     body=textwrap.dedent(
