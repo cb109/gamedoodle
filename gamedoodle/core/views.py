@@ -3,6 +3,7 @@ import textwrap
 import requests
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 from django.http import HttpRequest
 from django.shortcuts import redirect, render
 from django.urls import NoReverseMatch
@@ -402,7 +403,14 @@ def add_game(request, uuid):
     search_text = request.GET.get("q", "").strip()
     matching_games = []
     if search_text:
-        matching_games = Game.objects.filter(name__icontains=search_text).order_by(
+        full_text_query = Q(name__icontains=search_text)
+        words_query = Q()
+        for word in search_text.split(" "):
+            words_query &= Q(name__icontains=word)
+
+        matching_games = Game.objects.filter(
+            full_text_query | words_query
+        ).order_by(
             "name"
         )[:100]
 
