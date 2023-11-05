@@ -160,3 +160,5 @@ EMAIL_NOTIFICATIONS = {
     "GMAIL_USER": os.environ.get("GMAIL_USER", "no-gmail-user-set"),
     "GMAIL_PWD": os.environ.get("GMAIL_PWD", "no-gmail-password-set"),
 }
+
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 356  # One year in seconds
