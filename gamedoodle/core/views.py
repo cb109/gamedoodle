@@ -448,6 +448,13 @@ def add_game_manually(request, uuid):
     query_params = f"?game={game.id}"
     url = reverse("event-detail", kwargs={"uuid": uuid}) + query_params
 
+    # Ensure user also voted for the Game.
+    username = _get_username(request)
+    if username:
+        Vote.objects.get_or_create(
+            event=event, game_id=game.id, username=username
+        )
+
     return redirect(url)
 
 
@@ -462,8 +469,6 @@ def add_matching_game(request, uuid):
     """
     event = Event.objects.get(uuid=uuid)
     _raise_if_event_not_writable(event)
-
-    username = _get_username(request)
 
     game_id = request.POST["game_id"]
     game = Game.objects.get(id=game_id)
@@ -499,6 +504,7 @@ def add_matching_game(request, uuid):
     url = reverse("event-detail", kwargs={"uuid": uuid}) + query_params
 
     # Ensure user also voted for the Game.
+    username = _get_username(request)
     if username:
         Vote.objects.get_or_create(
             event=event, game_id=game.id, username=username
