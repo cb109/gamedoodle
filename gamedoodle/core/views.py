@@ -449,9 +449,16 @@ def add_game_manually(request, uuid):
 @require_http_methods(("POST",))
 @username_required
 def add_matching_game(request, uuid):
-    """Add actual game selected from Steam search results or an existing one."""
+    """Add actual game selected from Steam search results or an existing one.
+
+    Will also add a vote for that game, assuming the person adding it
+    will want to play it.
+
+    """
     event = Event.objects.get(uuid=uuid)
     _raise_if_event_not_writable(event)
+
+    username = _get_username(request)
 
     game_id = request.POST["game_id"]
     game = Game.objects.get(id=game_id)
@@ -481,4 +488,11 @@ def add_matching_game(request, uuid):
         game.save()
 
     event.games.add(game)
+
+    # Ensure user also voted for the Game.
+    if username:
+        Vote.objects.get_or_create(
+            event=event, game_id=game.id, username=username
+        )
+
     return redirect(reverse("event-detail", kwargs={"uuid": uuid}))
