@@ -443,7 +443,12 @@ def add_game_manually(request, uuid):
     game.save()
 
     event.games.add(game)
-    return redirect(reverse("event-detail", kwargs={"uuid": uuid}))
+
+    # Scroll to Game after it has been added.
+    query_params = f"?game={game.id}"
+    url = reverse("event-detail", kwargs={"uuid": uuid}) + query_params
+
+    return redirect(url)
 
 
 @require_http_methods(("POST",))
@@ -489,10 +494,14 @@ def add_matching_game(request, uuid):
 
     event.games.add(game)
 
+    # Scroll to Game after it has been added.
+    query_params = f"?game={game.id}"
+    url = reverse("event-detail", kwargs={"uuid": uuid}) + query_params
+
     # Ensure user also voted for the Game.
     if username:
         Vote.objects.get_or_create(
             event=event, game_id=game.id, username=username
         )
 
-    return redirect(reverse("event-detail", kwargs={"uuid": uuid}))
+    return redirect(url)
