@@ -11,7 +11,12 @@ from django.urls import resolve, reverse
 from django.views import generic
 from django.views.decorators.http import require_http_methods
 
-from gamedoodle.core.models import Event, EventSubscription, Game, Vote, Comment
+from gamedoodle.core.models import Comment
+from gamedoodle.core.models import Event
+from gamedoodle.core.models import EventGame
+from gamedoodle.core.models import EventSubscription
+from gamedoodle.core.models import Game
+from gamedoodle.core.models import Vote
 from gamedoodle.core.mailing import send_email_via_gmail
 
 
@@ -155,6 +160,7 @@ class EventDetailView(generic.DetailView):
                     event=event, username=username, is_superlike=True
                 ).exists()
             )
+            game.added_by_username = game.get_added_by_username_for_event(event)
 
         games = sorted(
             games, key=lambda game: f"{game.votes_value}-{game.name}", reverse=True
@@ -442,14 +448,18 @@ def add_game_manually(request, uuid):
         game.store_url = store_url
     game.save()
 
-    event.games.add(game)
+    username = _get_username(request)
+
+    event_game, created = EventGame.objects.get_or_create(event=event, game=game)
+    if created and username:
+        event_game.added_by_username = username
+        event_game.save(update_fields=["added_by_username"])
 
     # Scroll to Game after it has been added.
     query_params = f"?game={game.id}"
     url = reverse("event-detail", kwargs={"uuid": uuid}) + query_params
 
     # Ensure user also voted for the Game.
-    username = _get_username(request)
     if username:
         Vote.objects.get_or_create(
             event=event, game_id=game.id, username=username
@@ -497,14 +507,18 @@ def add_matching_game(request, uuid):
         game.is_free = data["is_free"]
         game.save()
 
-    event.games.add(game)
+    username = _get_username(request)
+
+    event_game, created = EventGame.objects.get_or_create(event=event, game=game)
+    if created and username:
+        event_game.added_by_username = username
+        event_game.save(update_fields=["added_by_username"])
 
     # Scroll to Game after it has been added.
     query_params = f"?game={game.id}"
     url = reverse("event-detail", kwargs={"uuid": uuid}) + query_params
 
     # Ensure user also voted for the Game.
-    username = _get_username(request)
     if username:
         Vote.objects.get_or_create(
             event=event, game_id=game.id, username=username

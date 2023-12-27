@@ -5,6 +5,7 @@ from django.utils.html import mark_safe
 from gamedoodle.core.models import (
     Comment,
     Event,
+    EventGame,
     EventSubscription,
     Game,
     SentMail,
@@ -60,13 +61,17 @@ class EventAdmin(admin.ModelAdmin):
 
     @mark_safe
     def gameslist(self, event):
-        lis = "".join(
-            [
-                f"<li><a href='{game.store_url}' target='_blank'>{game.name}</a></li>"
-                for game in event.games.all().order_by("name")
-            ]
-        )
-        return f"<ul>{lis}<ul>"
+        html = "<ul>"
+        for eventgame in EventGame.objects.filter(event=event).order_by("game__name"):
+            suffix = ""
+            if eventgame.added_by_username:
+                suffix = f" <small style='color: grey'>added by <b>"
+                suffix += f"  {eventgame.added_by_username}</b></small>"
+            html += f"<li><a href='{eventgame.game.store_url}' target='_blank'>"
+            html += f"  {eventgame.game.name}"
+            html += f"</a>{suffix}</li>"
+        html += "</ul>"
+        return html
 
     @mark_safe
     def url(self, event):

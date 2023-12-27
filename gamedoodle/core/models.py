@@ -28,7 +28,9 @@ class Event(TimestampedMixin, models.Model):
     name = models.CharField(max_length=256)
     details = models.TextField(default="", blank=True)
     date = models.DateField(default=date.today, blank=True, null=True)
-    games = models.ManyToManyField("Game", blank=True)
+    games = models.ManyToManyField(
+        "Game", blank=True, related_name="games", through="EventGame"
+    )
     read_only = models.BooleanField(default=False)
     listed = models.BooleanField(default=True)
 
@@ -41,6 +43,12 @@ class Event(TimestampedMixin, models.Model):
     @property
     def is_writable(self):
         return not self.read_only
+
+
+class EventGame(TimestampedMixin, models.Model):
+    event = models.ForeignKey("Event", on_delete=models.CASCADE)
+    game = models.ForeignKey("Game", on_delete=models.CASCADE)
+    added_by_username = models.CharField(max_length=256, default="", blank=True)
 
 
 class EventSubscription(TimestampedMixin, models.Model):
@@ -79,6 +87,9 @@ class Game(TimestampedMixin, models.Model):
         if ignore_softdeleted:
             comments = comments.exclude(softdeleted=True)
         return comments.order_by("created_at")
+
+    def get_added_by_username_for_event(self, event) -> str:
+        return EventGame.objects.get(event=event, game=self).added_by_username
 
 
 class Vote(TimestampedMixin, models.Model):
