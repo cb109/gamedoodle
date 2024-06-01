@@ -33,6 +33,23 @@ class EventSubscriptionAdmin(admin.ModelAdmin):
         "username",
     )
 
+    def duplicate_subscriptions_for_latest_event(self, request, queryset):
+        latest_event = Event.objects.latest("date")
+        for subscription in queryset:
+            duplicated_subscription, _ = EventSubscription.objects.get_or_create(
+                event=latest_event,
+                email=subscription.email,
+                defaults={"username": subscription.username}
+            )
+            duplicated_subscription.active = True
+            duplicated_subscription.save()
+
+    duplicate_subscriptions_for_latest_event.short_description = (
+        "Duplicate subscriptions for latest event"
+    )
+
+    actions = [duplicate_subscriptions_for_latest_event]
+
 
 class EventAdmin(admin.ModelAdmin):
     list_display = (
