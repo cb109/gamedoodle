@@ -64,8 +64,8 @@ class EventAdmin(admin.ModelAdmin):
         "url",
         "id",
     )
-    search_fields = ("name", "date", "gameslist")
-    autocomplete_fields = ("games",)
+    search_fields = ("name", "date")
+    filter_horizontal = ("games",)
     readonly_fields = (
         "uuid",
         "url",
@@ -143,11 +143,16 @@ class CommentAdmin(admin.ModelAdmin):
 
     visible.boolean = True
 
+class EventGameAdmin(admin.ModelAdmin):
+    list_display = ("event", "game", "added_by_username", "id")
+    autocomplete_fields = ("event", "game")
+
 
 admin.site.site_header = "gamedoodle admin"
 
 admin.site.register(Comment, CommentAdmin)
 admin.site.register(Event, EventAdmin)
+admin.site.register(EventGame, EventGameAdmin)
 admin.site.register(EventSubscription, EventSubscriptionAdmin)
 admin.site.register(Game, GameAdmin)
 admin.site.register(SentMail, SentMailAdmin)
