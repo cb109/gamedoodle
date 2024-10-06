@@ -44,6 +44,20 @@ class Event(TimestampedMixin, models.Model):
     def is_writable(self):
         return not self.read_only
 
+    @property
+    def usernames(self):
+        return sorted(
+            [
+                username
+                for username in (
+                    self.vote_set.all()
+                    .values_list("username", flat=True)
+                    .distinct()
+                )
+            ],
+            key=lambda username: username.lower()
+        )
+
 
 class EventGame(TimestampedMixin, models.Model):
     event = models.ForeignKey("Event", on_delete=models.CASCADE)

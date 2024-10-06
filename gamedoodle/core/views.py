@@ -72,26 +72,20 @@ def who_are_you(request):
     # If we are moving to an Event, let's get the list of usernames
     # and offer them to choose by the User, so it's easier to reuse
     # the same one across multiple devices.
-    existing_usernames = []
+    event_usernames = []
     event = None
     try:
         match = resolve(next_url)
         if match.url_name == "event-detail":
             event = Event.objects.get(uuid=match.kwargs["uuid"])
-            existing_usernames = sorted(
-                list(
-                    Vote.objects.filter(event=event)
-                    .values_list("username", flat=True)
-                    .distinct()
-                )
-            )
+            event_usernames = event.usernames
     except NoReverseMatch:
         pass
 
     return render(
         request,
         "core/who_are_you.html",
-        {"event": event, "existing_usernames": existing_usernames},
+        {"event": event, "existing_usernames": event_usernames},
     )
 
 

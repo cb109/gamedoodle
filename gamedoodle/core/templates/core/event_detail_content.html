@@ -43,6 +43,15 @@
       Event is in read-only mode and can not be modified!
     </div>
     {% endif %}
+    {% if event.usernames %}
+    <a
+      href="#"
+      class="nes-text is-primary"
+      onclick="alert({% for name in event.usernames %}'{{ name }}'{% if not forloop.last %} + ', ' + {% else %}{% endif %}{% endfor %})"
+    >
+      {{ event.usernames|length }} members
+    </a>
+    {% endif %}
   </div>
   <form
     hx-post="{% url "event-vote-game" uuid=event.uuid %}"
