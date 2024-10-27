@@ -7,9 +7,14 @@
   "
 >
   <h2>
-    Comment about voting for <span class="nes-text is-success">
-    {{ game.name }}</span> within <a href="{% url "event-detail" uuid=event.uuid %}">
-      {{ event.name }}</a>:
+    {% if game %}
+      Comment about voting for <span class="nes-text is-success">
+      {{ game.name }}</span> within <a href="{% url "event-detail" uuid=event.uuid %}">
+        {{ event.name }}</a>:
+    {% else %}
+      Comment in general for <a href="{% url "event-detail" uuid=event.uuid %}">
+        {{ event.name }}</a>:
+    {% endif %}
   </h2>
 
   <div
@@ -20,7 +25,7 @@
     "
   >
     <section class="message-list">
-      {% for comment in game.comments %}
+      {% for comment in comments %}
       <section
         class="message"
         style="margin-top: 16px;"

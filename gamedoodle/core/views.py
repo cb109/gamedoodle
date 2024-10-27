@@ -16,6 +16,7 @@ from gamedoodle.core.models import Event
 from gamedoodle.core.models import EventGame
 from gamedoodle.core.models import EventSubscription
 from gamedoodle.core.models import Game
+from gamedoodle.core.models import get_comments
 from gamedoodle.core.models import Vote
 from gamedoodle.core.mailing import send_email_via_gmail
 
@@ -141,6 +142,8 @@ class EventDetailView(generic.DetailView):
         unsubscribed = self.request.GET.get("unsubscribed") == "true"
         scroll_to_game_id = self.request.GET.get("game", None)
 
+        event.comments = get_comments(event)
+
         for game in games:
             game.comments = game.get_comments_for_event(event)
 
@@ -165,6 +168,7 @@ class EventDetailView(generic.DetailView):
         for game in games:
             game.voting_rank = sorted_unique_votes_value.index(game.votes_value) + 1
 
+        context["event"] = event
         context["username"] = username
         context["games"] = games
 
@@ -317,8 +321,13 @@ def vote_game(request, uuid):
 def add_comment(request, uuid):
     username = _get_username(request)
     event = Event.objects.get(uuid=uuid)
-    game = Game.objects.get(id=request.GET["game"])
-    game.comments = game.get_comments_for_event(event)
+
+    try:
+        game = Game.objects.get(id=request.GET["game"])
+        comments = game.get_comments_for_event(event)
+    except KeyError:
+        game = None
+        comments = get_comments(event)
 
     if request.method == "POST":
         _raise_if_event_not_writable(event)
@@ -331,13 +340,18 @@ def add_comment(request, uuid):
                 text=new_comment,
             )
             if request.htmx:
-                game.comments = game.get_comments_for_event(event)
+                if game:
+                    comments = game.get_comments_for_event(event)
+                else:
+                    comments = get_comments(event)
+
                 return render(
                     request,
                     "core/event_add_comment_content.html",
                     {
                         "event": event,
                         "game": game,
+                        "comments": comments,
                         "username": username,
                     },
                 )
@@ -349,6 +363,7 @@ def add_comment(request, uuid):
         {
             "event": event,
             "game": game,
+            "comments": comments,
             "username": username,
         },
     )
@@ -371,21 +386,24 @@ def delete_comment(request, comment_id):
 
     if request.htmx:
         game = comment.game
-        game.comments = game.get_comments_for_event(comment.event)
+        comments = game.get_comments_for_event(comment.event)
         return render(
             request,
             "core/event_add_comment_content.html",
             {
                 "event": comment.event,
                 "game": game,
+                "comments": comments,
                 "username": username,
             },
         )
 
     add_comment_url = (
         reverse("event-add-comment", args=(comment.event.uuid,))
-        + f"?game={comment.game.id}"
     )
+    if comment.game:
+        add_comment_url += f"?game={comment.game.id}"
+
     return redirect(add_comment_url)
 
 

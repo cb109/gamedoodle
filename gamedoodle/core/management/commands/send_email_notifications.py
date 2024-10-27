@@ -77,10 +77,16 @@ class Command(BaseCommand):
             if recent_comments.exists():
                 recent_changes_detected = True
             for comment in recent_comments:
-                event_descriptions.append(
-                    f"{comment.username} commented on {comment.game.name}: "
-                    f"{comment.short_preview}"
-                )
+                if comment.game:
+                    event_descriptions.append(
+                        f"{comment.username} commented on {comment.game.name}: "
+                        f"{comment.short_preview}"
+                    )
+                else:
+                    event_descriptions.append(
+                        f"{comment.username} commented: "
+                        f"{comment.short_preview}"
+                    )
 
             if recent_changes_detected:
                 event_url = site.domain + reverse(

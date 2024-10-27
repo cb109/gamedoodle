@@ -1,6 +1,8 @@
 import uuid
 from datetime import timedelta, date
 from functools import partial
+from typing import List
+from typing import Optional
 
 import bleach
 from bleach import Cleaner
@@ -93,40 +95,11 @@ class Game(TimestampedMixin, models.Model):
     def __str__(self):
         return f"{self.name} ({self.appid})"
 
-    def get_votes_for_event(self, event):
+    def get_votes_for_event(self, event: Event):
         return Vote.objects.filter(game=self, event=event).order_by("username")
 
-    def get_comments_for_event(
-        self,
-        event,
-        ignore_softdeleted: bool = True,
-        augment_alignment: bool = True
-    ) -> list:
-        comments = Comment.objects.filter(game=self, event=event)
-        if ignore_softdeleted:
-            comments = comments.exclude(softdeleted=True)
-        comments = list(comments.order_by("created_at"))
-
-        if augment_alignment:
-            comments = comments
-            current_alignment: str = "left"
-            for i, comment in enumerate(comments):
-                try:
-                    previous_comment = comments[i - 1]
-                except IndexError:
-                    previous_comment = None
-                if previous_comment and previous_comment.username == comment.username:
-                    current_alignment = getattr(
-                        previous_comment, "alignment", current_alignment
-                    )
-
-                comment.alignment = current_alignment
-
-                if current_alignment == "left":
-                    current_alignment = "right"
-                else:
-                    current_alignment = "left"
-        return comments
+    def get_comments_for_event(self, event: Event) -> List[Event]:
+        return get_comments(event=event, game=self)
 
     def get_added_by_username_for_event(self, event) -> str:
         return EventGame.objects.get(event=event, game=self).added_by_username
@@ -161,7 +134,12 @@ class Vote(TimestampedMixin, models.Model):
 
 class Comment(TimestampedMixin, models.Model):
     event = models.ForeignKey("Event", on_delete=models.CASCADE)
-    game = models.ForeignKey("Game", on_delete=models.CASCADE)
+
+    game = models.ForeignKey(
+        "Game", on_delete=models.CASCADE, null=True, blank=True, default=None
+    )
+    """If the comment is not linked to a Game, it's a global Event comment."""
+
     username = models.CharField(max_length=256)
     text = models.TextField()
     softdeleted = models.BooleanField(default=False)
@@ -170,7 +148,7 @@ class Comment(TimestampedMixin, models.Model):
         return f"{self.username} commented on '{self.game}' during '{self.event}'"
 
     def save(self, *args, **kwargs):
-        if not self.game in self.event.games.all():
+        if self.game and not self.game in self.event.games.all():
             raise ValidationError(
                 f"Can only comment on game that belongs to event {self.event}, "
                 f"but tried to comment on {self.game}"
@@ -220,3 +198,36 @@ class SentMail(TimestampedMixin, models.Model):
     subject = models.TextField()
     body = models.TextField()
     html = models.TextField()
+
+
+def get_comments(
+    event: Event,
+    game: Optional[Game] = None,
+    ignore_softdeleted: bool = True,
+    augment_alignment: bool = True
+) -> List[Comment]:
+    comments = Comment.objects.filter(event=event, game=game)
+    if ignore_softdeleted:
+        comments = comments.exclude(softdeleted=True)
+    comments = list(comments.order_by("created_at"))
+
+    if augment_alignment:
+        comments = comments
+        current_alignment: str = "left"
+        for i, comment in enumerate(comments):
+            try:
+                previous_comment = comments[i - 1]
+            except IndexError:
+                previous_comment = None
+            if previous_comment and previous_comment.username == comment.username:
+                current_alignment = getattr(
+                    previous_comment, "alignment", current_alignment
+                )
+
+            comment.alignment = current_alignment
+
+            if current_alignment == "left":
+                current_alignment = "right"
+            else:
+                current_alignment = "left"
+    return comments
