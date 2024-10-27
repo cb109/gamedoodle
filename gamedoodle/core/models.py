@@ -96,11 +96,37 @@ class Game(TimestampedMixin, models.Model):
     def get_votes_for_event(self, event):
         return Vote.objects.filter(game=self, event=event).order_by("username")
 
-    def get_comments_for_event(self, event, ignore_softdeleted=True):
+    def get_comments_for_event(
+        self,
+        event,
+        ignore_softdeleted: bool = True,
+        augment_alignment: bool = True
+    ) -> list:
         comments = Comment.objects.filter(game=self, event=event)
         if ignore_softdeleted:
             comments = comments.exclude(softdeleted=True)
-        return comments.order_by("created_at")
+        comments = list(comments.order_by("created_at"))
+
+        if augment_alignment:
+            comments = comments
+            current_alignment: str = "left"
+            for i, comment in enumerate(comments):
+                try:
+                    previous_comment = comments[i - 1]
+                except IndexError:
+                    previous_comment = None
+                if previous_comment and previous_comment.username == comment.username:
+                    current_alignment = getattr(
+                        previous_comment, "alignment", current_alignment
+                    )
+
+                comment.alignment = current_alignment
+
+                if current_alignment == "left":
+                    current_alignment = "right"
+                else:
+                    current_alignment = "left"
+        return comments
 
     def get_added_by_username_for_event(self, event) -> str:
         return EventGame.objects.get(event=event, game=self).added_by_username

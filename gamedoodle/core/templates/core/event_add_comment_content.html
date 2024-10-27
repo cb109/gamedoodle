@@ -8,7 +8,7 @@
 >
   <h2>
     Comment about voting for <span class="nes-text is-success">
-    {{game.name }}</span> within <a href="{% url "event-detail" uuid=event.uuid %}">
+    {{ game.name }}</span> within <a href="{% url "event-detail" uuid=event.uuid %}">
       {{ event.name }}</a>:
   </h2>
 
@@ -22,7 +22,7 @@
     <section class="message-list">
       {% for comment in game.comments %}
       <section
-        class="message {% cycle '-left' '-right' %}"
+        class="message"
         style="margin-top: 16px;"
       >
         <div
@@ -30,11 +30,18 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            align-items: {% if not forloop.counter|divisibleby:2 %}flex-start{% else %}flex-end{% endif %};
+            align-items: {% if comment.alignment == "left" %}flex-start{% else %}flex-end{% endif %};
           "
         >
           <div
-            class="nes-balloon from-{% cycle 'left' 'right' %}"
+            class="
+              nes-balloon
+              {% if comment.alignment == "left" %}
+                from-left
+              {% else %}
+                from-right
+              {% endif %}
+            "
             style="max-width: 800px"
           >
             <p>{{ comment.text_as_html|safe }}</p>
@@ -44,7 +51,7 @@
             <span style="
               width: 100%;
               display: inline-block;
-              text-align: {% if not forloop.counter|divisibleby:2 %}left{% else %}right{% endif %};
+              text-align: {% if comment.alignment == "left" %}left{% else %}right{% endif %};
             ">{{ comment.username }} {% if comment.is_new and not comment.event.read_only %}
               <a
                 hx-post="{% url 'delete-comment' comment.id %}"
