@@ -57,7 +57,7 @@
               width: 100%;
               display: inline-block;
               text-align: {% if comment.alignment == "left" %}left{% else %}right{% endif %};
-            ">{{ comment.username }} {% if comment.is_new and not comment.event.read_only %}
+            ">{{ comment.username }} {% if comment.is_new and comment.username == username and not comment.event.read_only %}
               <a
                 hx-post="{% url 'delete-comment' comment.id %}"
                 hx-target="#event-add-comment-content"
