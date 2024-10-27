@@ -69,6 +69,7 @@
     </section>
   </div>
 
+  {% if not event.read_only %}
   <div
     style="
       margin-top: 48px;
@@ -106,4 +107,5 @@
       </div>
     </form>
   </div>
+  {% endif %}
 </div>
