@@ -128,10 +128,10 @@ class VoteAdmin(admin.ModelAdmin):
 class CommentAdmin(admin.ModelAdmin):
     list_display = (
         "username",
+        "visible",
         "event",
         "game",
         "text",
-        "visible",
         "created_at",
         "modified_at",
         "id",
