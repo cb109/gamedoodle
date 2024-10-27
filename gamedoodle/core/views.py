@@ -385,8 +385,12 @@ def delete_comment(request, comment_id):
     comment.save(update_fields=["softdeleted"])
 
     if request.htmx:
-        game = comment.game
-        comments = game.get_comments_for_event(comment.event)
+        if comment.game:
+            game = comment.game
+            comments = game.get_comments_for_event(comment.event)
+        else:
+            game = None
+            comments = get_comments(comment.event)
         return render(
             request,
             "core/event_add_comment_content.html",
