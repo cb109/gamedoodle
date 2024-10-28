@@ -145,7 +145,9 @@ class Comment(TimestampedMixin, models.Model):
     softdeleted = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.username} commented on '{self.game}' during '{self.event}'"
+        if self.game:
+            return f"{self.username} commented on '{self.game}' during '{self.event}'"
+        return f"{self.username} commented during '{self.event}'"
 
     def save(self, *args, **kwargs):
         if self.game and not self.game in self.event.games.all():
