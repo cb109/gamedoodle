@@ -57,7 +57,7 @@
       class="nes-pointer"
       href="{% url "event-add-comment" uuid=event.uuid %}"
     >
-      {% if event.comments|length > 1 %}
+      {% if event.comments|length > 0 %}
       <span class="nes-text is-primary">
         {{ event.comments|length }}
         {% if event.comments|length == 1 %}Comment{% else %}Comments{% endif %}
