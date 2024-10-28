@@ -135,6 +135,8 @@ class EventDetailView(generic.DetailView):
         context = super().get_context_data(**kwargs)
 
         event = self.get_object()
+        event.comments = get_comments(event)
+
         username = _get_username(self.request)
         games = list(event.games.all())
 
