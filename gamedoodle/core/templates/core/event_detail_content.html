@@ -292,7 +292,7 @@
           class="nes-pointer"
           href="{% url "event-add-comment" uuid=event.uuid %}?game={{game.id }}"
         >
-          {% if game.comments|length > 1 %}
+          {% if game.comments|length > 0 %}
           <span class="nes-text is-primary">
             {{ game.comments|length }}
             {% if game.comments|length == 1 %}Comment{% else %}Comments{% endif %}
