@@ -1,3 +1,5 @@
+.env
 *.py[cod]
 Activate.ps1
 db.sqlite3
+settings.ini
