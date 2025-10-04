@@ -13,6 +13,18 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 import os
 from pathlib import Path
 
+from decouple import config
+
+
+SENTRY_DSN: str = config("SENTRY_DSN", cast=str, default="")
+if SENTRY_DSN:
+    import sentry_sdk
+
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        send_default_pii=True,
+    )
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -27,7 +39,6 @@ SECRET_KEY = "5m4r5-7%dn4=li7z6-6^#ax55q+@yvds6oj#f(or3e^(k+3425"
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 

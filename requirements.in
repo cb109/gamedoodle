@@ -4,5 +4,7 @@ django-easy-audit
 django-htmx
 gunicorn
 pip-tools
+python-decouple
 requests
+sentry-sdk[django]
 whitenoise
