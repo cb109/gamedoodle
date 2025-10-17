@@ -146,6 +146,7 @@ class CommentAdmin(admin.ModelAdmin):
 class EventGameAdmin(admin.ModelAdmin):
     list_display = ("event", "game", "added_by_username", "id")
     autocomplete_fields = ("event", "game")
+    search_fields = ("event__name", "game__name", "added_by_username", "id")
 
 
 admin.site.site_header = "gamedoodle admin"
