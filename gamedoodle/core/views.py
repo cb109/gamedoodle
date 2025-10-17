@@ -511,11 +511,9 @@ def add_matching_game(request, uuid):
         # Fetch to set/update details.
         url = settings.STEAM_API_BASE_URL_APPDETAILS + steam_appid_str
         response = requests.get(url)
-        try:
-            data = response.json()[steam_appid_str]["data"]
-        except KeyError as err:
-            print(err)
-            return redirect(reverse("event-detail", kwargs={"uuid": uuid}))
+
+        raw: dict = response.json()[steam_appid_str]
+        data: dict = raw["data"]
 
         screenshots = data.get("screenshots", [])
         if game.image_url == "" and screenshots:
