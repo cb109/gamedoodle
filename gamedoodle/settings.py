@@ -33,7 +33,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "5m4r5-7%dn4=li7z6-6^#ax55q+@yvds6oj#f(or3e^(k+3425"
+SECRET_KEY = config("SECRET_KEY",default="change-this-very-secret-key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -157,7 +157,7 @@ DJANGO_EASY_AUDIT_CRUD_EVENT_NO_CHANGED_FIELDS_SKIP = True
 
 AUTO_FORMAT_USERNAMES = True
 DATE_FORMAT = "%d.%m.%Y"
-STEAM_API_KEY = os.environ.get("STEAM_API_KEY", "no-api-key-set")
+STEAM_API_KEY = config("STEAM_API_KEY", "no-api-key-set")
 STEAM_API_URL_GET_APP_LIST = (
     "https://api.steampowered.com/ISteamApps/GetAppList/v0002/"
     f"?key={STEAM_API_KEY}&format=json"
@@ -166,10 +166,10 @@ STEAM_STORE_PAGE_BASE_URL = "https://store.steampowered.com/app/"  # + appid
 STEAM_API_BASE_URL_APPDETAILS = "https://store.steampowered.com/api/appdetails/?appids="
 
 EMAIL_NOTIFICATIONS = {
-    "GMAIL_SMTP_SERVER": os.environ.get("GMAIL_SMTP_SERVER", "smtp.gmail.com"),
-    "GMAIL_SMTP_PORT": os.environ.get("GMAIL_SMTP_PORT", 587),
-    "GMAIL_USER": os.environ.get("GMAIL_USER", "no-gmail-user-set"),
-    "GMAIL_PWD": os.environ.get("GMAIL_PWD", "no-gmail-password-set"),
+    "GMAIL_SMTP_SERVER": config("GMAIL_SMTP_SERVER", default="smtp.gmail.com"),
+    "GMAIL_SMTP_PORT": config("GMAIL_SMTP_PORT", cast=int, default=587),
+    "GMAIL_USER": config("GMAIL_USER", default="no-gmail-user-set"),
+    "GMAIL_PWD": config("GMAIL_PWD", default="no-gmail-password-set"),
 }
 
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 356  # One year in seconds
