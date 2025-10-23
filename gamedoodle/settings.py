@@ -10,10 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
-import os
 from pathlib import Path
 
 from decouple import config
+from decouple import Csv
 
 
 SENTRY_DSN: str = config("SENTRY_DSN", cast=str, default="")
@@ -38,7 +38,7 @@ SECRET_KEY = config("SECRET_KEY",default="change-this-very-secret-key")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=Csv(), default=[])
 
 # Application definition
 
