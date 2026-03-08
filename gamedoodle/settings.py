@@ -157,7 +157,13 @@ DJANGO_EASY_AUDIT_CRUD_EVENT_NO_CHANGED_FIELDS_SKIP = True
 
 AUTO_FORMAT_USERNAMES = True
 DATE_FORMAT = "%d.%m.%Y"
+
+# https://steamapi.xpaw.me/#IStoreService/GetAppList
 STEAM_API_KEY = config("STEAM_API_KEY", "no-api-key-set")
+STEAM_API_URL_GET_APP_LIST = (
+    "https://api.steampowered.com/IStoreService/GetAppList/v1/"
+    f"?key={STEAM_API_KEY}&format=json&max_results=50000"
+)
 STEAM_API_URL_GET_APP_LIST = (
     "https://api.steampowered.com/ISteamApps/GetAppList/v0002/"
     f"?key={STEAM_API_KEY}&format=json"
